@@ -133,8 +133,8 @@ import { TopProductsModule } from './top-products/top-products.module';
           port: 587,
           secure: false,
           auth: {
-            user: 'xinzo.shop@gmail.com',
-            pass: 'htqs fjsp ybgz lukl',
+            user: 'humairakhonom@gmail.com',
+            pass: 'uxwm cwcx afmw qbso',
           },
           tls: {
             rejectUnauthorized: false,
