@@ -1,0 +1,2 @@
+export declare const generateNewInvoiceAdminNotification: (customerName: string, customerEmail: string, invoiceNumber: string, transactionId: string, totalAmount: number, amountType: string, createdDate: string, companyName: string) => string;
+export declare const generateBankPaymentAdminNotification: (customerName: string, customerEmail: string, invoiceNumber: string, transactionId: string, totalAmount: number, bankName: string, paymentAmount: number, accLastDigit: string, submittedDate: string, companyName: string) => string;
