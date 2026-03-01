@@ -787,7 +787,7 @@ export class SystemuserService {
         const greetingName = updatedUser.name || updatedUser.email;
         const loginUrl =
           this.configService.get<string>('RESELLER_LOGIN_URL') ||
-          'https://xinzo.shop';
+          'https://www.fiberace.shop';
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f4f4f5; padding: 24px;">

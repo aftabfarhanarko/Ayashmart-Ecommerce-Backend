@@ -1036,7 +1036,7 @@ export class OrderService {
           subject = `Order #${order.id} is now being processed`;
 
           // Build public tracking URL for customer email (frontend URL comes from env)
-          const frontendBase ='https://xinzo.shop';
+          const frontendBase = 'https://www.fiberace.shop';
           const trackingId = order.shippingTrackingId ?? undefined;
           const trackingUrl =
             frontendBase && trackingId

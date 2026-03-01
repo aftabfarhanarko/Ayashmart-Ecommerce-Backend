@@ -189,7 +189,7 @@ export class ResellerService {
       if (reseller?.email) {
         const loginUrl =
           this.configService.get<string>('RESELLER_LOGIN_URL') ||
-          'https://xinzo.shop';
+          'https://www.fiberace.shop';
 
         const amount = Number(saved.amount).toFixed(2);
         const requestedAt = saved.createdAt
@@ -336,7 +336,7 @@ export class ResellerService {
       if (reseller?.email) {
         const loginUrl =
           this.configService.get<string>('RESELLER_LOGIN_URL') ||
-          'https://xinzo.shop';
+          'https://www.fiberace.shop';
 
         const amount = Number(saved.amount).toFixed(2);
         const paidAt = saved.paidAt
@@ -484,7 +484,7 @@ export class ResellerService {
     try {
       const loginUrl =
         this.configService.get<string>('RESELLER_LOGIN_URL') ||
-        'https://xinzo.shop';
+        'https://www.fiberace.shop';
 
       const html = `
         <p>Hi ${saved.name || 'there'},</p>
