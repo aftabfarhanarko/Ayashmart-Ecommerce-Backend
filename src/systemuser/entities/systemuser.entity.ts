@@ -42,7 +42,7 @@ export class SystemUser {
   subdomain: string | null;
 
   /**
-   * Controls whether the platform subdomain (e.g. ovi.console.squadcart.app)
+   * Controls whether the platform subdomain (e.g. ovi.console.innowavecart.app)
    * should serve the project directly. When disabled and a verified custom
    * domain exists, the middleware will redirect traffic from the subdomain
    * to the custom domain.

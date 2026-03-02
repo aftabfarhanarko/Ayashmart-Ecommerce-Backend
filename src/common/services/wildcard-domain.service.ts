@@ -10,17 +10,17 @@ export interface WildcardSetupResult {
 }
 
 /**
- * Automates wildcard DNS setup for *.console.squadcart.app (or MAIN_DOMAIN).
+ * Automates wildcard DNS setup for *.console.innowavecart.app (or MAIN_DOMAIN).
  * 1. Creates CNAME *.console -> RAILWAY_SERVICE_DOMAIN in Cloudflare
- * 2. Adds *.console.squadcart.app to Railway project via GraphQL API
+ * 2. Adds *.console.innowavecart.app to Railway project via GraphQL API
  *
  * Required env:
- * - CLOUDFLARE_ZONE_ID: Zone ID for squadcart.app
+ * - CLOUDFLARE_ZONE_ID: Zone ID for innowavecart.app
  * - CLOUDFLARE_API_TOKEN: API token with Zone:DNS:Edit
  * - RAILWAY_TOKEN: Railway API token
  * - RAILWAY_PROJECT_ID: Railway project ID
- * - RAILWAY_SERVICE_DOMAIN: e.g. squadcart-console.up.railway.app
- * - MAIN_DOMAIN: e.g. console.squadcart.app (optional, defaults to console.squadcart.app)
+ * - RAILWAY_SERVICE_DOMAIN: e.g. innowavecart-console.up.railway.app
+ * - MAIN_DOMAIN: e.g. console.innowavecart.app (optional, defaults to console.innowavecart.app)
  */
 @Injectable()
 export class WildcardDomainService {
@@ -57,7 +57,7 @@ export class WildcardDomainService {
   }
 
   private get mainDomain(): string {
-    return this.configService.get<string>('MAIN_DOMAIN') ?? 'console.squadcart.app';
+    return this.configService.get<string>('MAIN_DOMAIN') ?? 'console.innowavecart.app';
   }
 
   isConfigured(): boolean {
@@ -71,7 +71,7 @@ export class WildcardDomainService {
   }
 
   /**
-   * Ensures wildcard CNAME *.console.squadcart.app exists in Cloudflare
+   * Ensures wildcard CNAME *.console.innowavecart.app exists in Cloudflare
    * pointing to RAILWAY_SERVICE_DOMAIN.
    */
   async ensureCloudflareWildcardDns(): Promise<{ done: boolean; message: string; recordId?: string }> {
@@ -82,9 +82,9 @@ export class WildcardDomainService {
       };
     }
 
-    const mainDomain = this.mainDomain; // e.g. console.squadcart.app
+    const mainDomain = this.mainDomain; // e.g. console.innowavecart.app
     const baseName = mainDomain.split('.')[0]; // e.g. console
-    const wildcardName = `*.${baseName}`; // *.console (Cloudflare uses this for *.console.squadcart.app)
+    const wildcardName = `*.${baseName}`; // *.console (Cloudflare uses this for *.console.innowavecart.app)
     const target = this.railwayServiceDomain;
 
     try {
@@ -98,8 +98,8 @@ export class WildcardDomainService {
       );
 
       const records = listRes.data?.result ?? [];
-      const zoneApex = mainDomain.includes('.') ? mainDomain.split('.').slice(-2).join('.') : 'squadcart.app';
-      const wildcardFqdn = `${wildcardName}.${zoneApex}`; // *.console.squadcart.app
+      const zoneApex = mainDomain.includes('.') ? mainDomain.split('.').slice(-2).join('.') : 'innowavecart.app';
+      const wildcardFqdn = `${wildcardName}.${zoneApex}`; // *.console.innowavecart.app
       const existing = Array.isArray(records)
         ? records.find((r: any) => r.name === wildcardFqdn)
         : null;
@@ -120,7 +120,7 @@ export class WildcardDomainService {
       }
 
       // Create new record - Cloudflare expects name relative to zone
-      // For zone squadcart.app: name "*.console" creates *.console.squadcart.app
+      // For zone innowavecart.app: name "*.console" creates *.console.innowavecart.app
       const createRes = await axios.post(
         `https://api.cloudflare.com/client/v4/zones/${this.zoneId}/dns_records`,
         {
@@ -155,7 +155,7 @@ export class WildcardDomainService {
   }
 
   /**
-   * Adds *.console.squadcart.app to Railway project so it accepts traffic and provisions SSL.
+   * Adds *.console.innowavecart.app to Railway project so it accepts traffic and provisions SSL.
    */
   async ensureRailwayWildcardDomain(): Promise<{ done: boolean; message: string }> {
     if (!this.railwayToken || !this.railwayProjectId || !this.railwayServiceDomain) {
@@ -165,7 +165,7 @@ export class WildcardDomainService {
       };
     }
 
-    const wildcardDomain = `*.${this.mainDomain}`; // *.console.squadcart.app
+    const wildcardDomain = `*.${this.mainDomain}`; // *.console.innowavecart.app
 
     try {
       const variables: Record<string, string> = {

@@ -637,7 +637,7 @@ export class InvoiceService {
       }
 
       customer.subdomain = uniqueSlug;
-      // By default, enable platform subdomain so <slug>.console.squadcart.app works
+      // By default, enable platform subdomain so <slug>.console.innowavecart.app works
       (customer as any).subdomainEnabled =
         (customer as any).subdomainEnabled !== undefined
           ? (customer as any).subdomainEnabled
@@ -646,7 +646,7 @@ export class InvoiceService {
       await this.systemUserRepository.save(customer);
 
       // Auto-provision subdomain in Railway (fire-and-forget)
-      // This will add the subdomain (e.g., "ovi.console.squadcart.app") to Railway
+      // This will add the subdomain (e.g., "ovi.console.innowavecart.app") to Railway
       // Railway will automatically provision SSL certificate once DNS is configured
       this.systemuserService
         .provisionSubdomainInRailway(customer.id)

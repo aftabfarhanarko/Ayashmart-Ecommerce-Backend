@@ -21,7 +21,7 @@ export class SuperadminController {
   }
 
   /**
-   * Trigger wildcard DNS setup: Cloudflare CNAME (*.console.squadcart.app) + Railway domain.
+   * Trigger wildcard DNS setup: Cloudflare CNAME (*.console.innowavecart.app) + Railway domain.
    * Runs automatically on startup; can also be called manually for re-setup.
    */
   @Post('wildcard/setup')

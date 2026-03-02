@@ -80,12 +80,32 @@ export class OrderService {
           throw new BadRequestException("Your account has been banned. You cannot create orders.");
         }
       } else if (createDto.customerEmail?.trim()) {
-        // Guest order: check if email belongs to a banned user
-        const userByEmail = await this.userRepo.findOne({
-          where: { email: createDto.customerEmail.trim(), companyId },
+        const email = createDto.customerEmail.trim();
+        // Try to find existing customer by email for this company
+        let userByEmail = await this.userRepo.findOne({
+          where: { email, companyId },
         });
-        if (userByEmail?.isBanned) {
-          throw new BadRequestException("Your account has been banned. You cannot create orders.");
+
+        if (userByEmail) {
+          // Existing customer: block if banned, otherwise use this customer
+          if (userByEmail.isBanned) {
+            throw new BadRequestException("Your account has been banned. You cannot create orders.");
+          }
+
+          customer = userByEmail;
+        } else {
+          // No existing customer: create lightweight customer account automatically (no login required)
+          const newCustomer = this.userRepo.create({
+            name: createDto.customerName ?? "",
+            email,
+            phone: createDto.customerPhone ?? "",
+            address: createDto.shippingAddress ?? createDto.customerAddress ?? "",
+            role: "customer",
+            isActive: true,
+            companyId,
+          });
+
+          customer = await this.userRepo.save(newCustomer);
         }
       }
 
@@ -1073,7 +1093,7 @@ export class OrderService {
       }
 
       await this.mailer.sendMail({
-        from: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@squadcart.com",
+        from: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@innowavecart.com",
         to: email,
         subject,
         html,

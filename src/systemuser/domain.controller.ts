@@ -28,7 +28,7 @@ export class DomainController {
       .provisionCustomDomainInRailway(userId)
       .catch((err) => console.error('provisionCustomDomainInRailway:', err));
 
-    const cnameTarget = 'console.squadcart.app';
+    const cnameTarget = 'console.innowavecart.app';
 
     return {
       success: true,
@@ -42,7 +42,7 @@ export class DomainController {
             ? {
                 name: this.dnsVerification.getTxtRecordHost(updated.customDomain),
                 value: (updated as any).customDomainVerificationCode,
-                fullName: `_squadcart-verify.${updated.customDomain}`,
+                fullName: `_innowavecart-verify.${updated.customDomain}`,
               }
             : null,
         },
@@ -55,9 +55,9 @@ export class DomainController {
     const userId = req.user.userId;
     const user = await this.systemUserService.findOne(userId);
 
-    const cnameTarget = 'console.squadcart.app';
+    const cnameTarget = 'console.innowavecart.app';
 
-    const mainDomain = 'console.squadcart.app';
+    const mainDomain = 'console.innowavecart.app';
 
     const platformSubdomain = user.subdomain
       ? `${user.subdomain}.${mainDomain}`
@@ -86,7 +86,7 @@ export class DomainController {
           ? {
               name: this.dnsVerification.getTxtRecordHost(user.customDomain),
               value: (user as any).customDomainVerificationCode,
-              fullName: `_squadcart-verify.${user.customDomain}`,
+              fullName: `_innowavecart-verify.${user.customDomain}`,
               note: 'Add this TXT record to prove domain ownership. Verification runs automatically every few minutes.',
             }
           : null,

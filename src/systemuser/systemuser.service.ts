@@ -127,7 +127,7 @@ export class SystemuserService {
       return;
     }
 
-    const mainDomain = 'console.squadcart.app';
+    const mainDomain = 'console.innowavecart.app';
     const subdomainUrl = `https://${user.subdomain}.${mainDomain}`;
 
     const tempPassword = crypto.randomBytes(8).toString('hex');
@@ -241,7 +241,7 @@ export class SystemuserService {
    * - Railway automatically provisions SSL certificates
    * 
    * This method logs that subdomain is ready - Railway will route it automatically
-   * via wildcard DNS configuration (*.console.squadcart.app → Railway service)
+   * via wildcard DNS configuration (*.console.innowavecart.app → Railway service)
    */
   async provisionSubdomainInRailway(userId: number): Promise<void> {
     const user = await this.systemUserRepo.findOne({ where: { id: userId } });
@@ -252,16 +252,16 @@ export class SystemuserService {
     const mainDomain = 
       this.configService.get<string>('MAIN_DOMAIN') ||
       process.env.MAIN_DOMAIN ||
-      'console.squadcart.app';
+      'console.innowavecart.app';
     
     const fullSubdomain = `${user.subdomain}.${mainDomain}`;
 
     // Railway wildcard DNS handles subdomains automatically
     // No API call needed - just ensure wildcard DNS is configured:
-    // *.console.squadcart.app → Railway service domain (e.g., abc123.up.railway.app)
+    // *.console.innowavecart.app → Railway service domain (e.g., abc123.up.railway.app)
     console.log(`✅ Subdomain "${fullSubdomain}" ready`);
     console.log('📋 Railway will route automatically via wildcard DNS');
-    console.log('💡 Ensure wildcard DNS is configured: *.console.squadcart.app → Railway service');
+    console.log('💡 Ensure wildcard DNS is configured: *.console.innowavecart.app → Railway service');
     console.log('💡 Railway will automatically provision SSL certificate');
   }
 
@@ -1098,7 +1098,7 @@ export class SystemuserService {
     await this.systemUserRepo.save(user);
 
     // Create reset link
-    const frontendUrl = process.env.FRONTEND_URL || 'https://squadcart-console.up.railway.app';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://innowavecart-console.up.railway.app';
     const resetLink = `${frontendUrl}/reset-password?id=${user.id}&token=${resetToken}`;
 
     // Send email
