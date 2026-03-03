@@ -36,7 +36,29 @@ export class UsersController {
       throw new BadRequestException('Password is required');
     }
     const user = await this.usersService.create(createUserDto, companyId);
-    return { statusCode: HttpStatus.CREATED, message: 'User registered successfully', data: user };
+
+    // Auto-login: generate access token for the newly registered user
+    let accessToken: string | undefined;
+    let safeUser: any = user;
+    try {
+      const loginResult = await this.usersService.login(
+        createUserDto.email,
+        createUserDto.password,
+        companyId,
+      );
+      accessToken = loginResult.accessToken;
+      safeUser = loginResult.user;
+    } catch (e) {
+      // If auto-login fails, we still return successful registration
+      console.error('Auto-login after register failed:', e);
+    }
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User registered successfully',
+      data: user,
+      ...(accessToken && safeUser ? { accessToken, user: safeUser } : {}),
+    };
   }
 
   @Post('login')
@@ -110,7 +132,30 @@ export class UsersController {
     }
 
     const user = await this.usersService.create(createUserDto, companyId);
-    return { statusCode: HttpStatus.CREATED, message: 'User created', data: user };
+
+    // Auto-login when password is provided (e.g. customer self-registration)
+    let accessToken: string | undefined;
+    let safeUser: any = user;
+    if (createUserDto.password) {
+      try {
+        const loginResult = await this.usersService.login(
+          createUserDto.email,
+          createUserDto.password,
+          companyId,
+        );
+        accessToken = loginResult.accessToken;
+        safeUser = loginResult.user;
+      } catch (e) {
+        console.error('Auto-login after user create failed:', e);
+      }
+    }
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User created',
+      data: user,
+      ...(accessToken && safeUser ? { accessToken, user: safeUser } : {}),
+    };
   }
 
   /** Returns current customer from tbl_users only (storefront). Use /auth/me for systemuser. */
