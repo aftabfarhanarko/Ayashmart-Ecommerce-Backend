@@ -1098,7 +1098,7 @@ export class SystemuserService {
     await this.systemUserRepo.save(user);
 
     // Create reset link
-    const frontendUrl = process.env.FRONTEND_URL || 'https://innowavecart-console.up.railway.app';
+    const frontendUrl = 'https://www.fiberace.shop';
     const resetLink = `${frontendUrl}/reset-password?id=${user.id}&token=${resetToken}`;
 
     // Send email

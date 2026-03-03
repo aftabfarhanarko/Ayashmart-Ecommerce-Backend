@@ -63,4 +63,10 @@ export class User {
 
   @Column({ nullable: true })
   passwordSalt?: string;
+
+  @Column({ type: 'text', nullable: true })
+  resetPasswordToken?: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordExpires?: Date | null;
 }

@@ -6,6 +6,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { QueryUsersDto } from './dto/query-users.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CompanyIdGuard } from '../common/guards/company-id.guard';
 import { CompanyId } from '../common/decorators/company-id.decorator';
@@ -46,6 +48,52 @@ export class UsersController {
       loginDto.companyId
     );
     return { statusCode: HttpStatus.OK, message: 'Login successful', accessToken, user };
+  }
+
+  @Post('forgot-password')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(
+    @Body() body: ForgotPasswordDto & { companyId?: string },
+    @Query('companyId') companyIdFromQuery?: string,
+  ) {
+    const companyId = body.companyId || companyIdFromQuery;
+    if (!companyId) {
+      throw new BadRequestException('CompanyId is required');
+    }
+    const result = await this.usersService.requestPasswordReset(body.email, companyId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
+      data: { success: result.success, message: result.message },
+    };
+  }
+
+  @Post('reset-password/:userId/:token')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('token') token: string,
+    @Body() body: ResetPasswordDto & { companyId?: string },
+    @Query('companyId') companyIdFromQuery?: string,
+  ) {
+    const companyId = body.companyId || companyIdFromQuery;
+    if (!companyId) {
+      throw new BadRequestException('CompanyId is required');
+    }
+    const result = await this.usersService.resetPassword(
+      userId,
+      token,
+      body.password,
+      body.confirmPassword,
+      companyId,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
+      data: result,
+    };
   }
 
   @Post()

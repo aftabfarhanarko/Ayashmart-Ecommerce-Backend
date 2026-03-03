@@ -24,6 +24,8 @@ export class UsersService {
     private readonly jwtService: JwtService,
     @Inject(forwardRef(() => NotificationsService))
     private readonly notificationsService: NotificationsService,
+    @Inject('MAILER_TRANSPORT')
+    private readonly mailer: { sendMail: (message: any) => Promise<{ id?: string }> },
   ) {}
 
   private hashPassword(password: string, salt: string): string {
@@ -272,5 +274,127 @@ export class UsersService {
 
     const { passwordHash, passwordSalt, ...safe } = user as any;
     return { accessToken, user: safe };
+  }
+
+  async requestPasswordReset(email: string, companyId: string) {
+    if (!companyId) {
+      throw new BadRequestException('CompanyId is required');
+    }
+
+    const user = await this.repository.findOne({
+      where: { email, companyId },
+    });
+
+    // For security reasons, do not reveal whether the email exists
+    if (!user) {
+      return {
+        success: true,
+        message: 'If the email exists, a password reset link has been sent.',
+      };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    const resetTokenExpiry = new Date();
+    resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1);
+
+    user.resetPasswordToken = resetTokenHash;
+    user.resetPasswordExpires = resetTokenExpiry;
+    await this.repository.save(user);
+
+    const frontendUrl =
+      process.env.STOREFRONT_URL ||
+      process.env.FRONTEND_URL ||
+      'https://www.fiberace.shop';
+    const resetLink = `${frontendUrl}/reset-password?id=${user.id}&token=${resetToken}&type=customer`;
+
+    try {
+      const html = `
+        <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f9fafb; padding: 24px;">
+          <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px 24px 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.12);">
+            <div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #6366f1; font-weight: 600; margin-bottom: 6px;">
+              Password reset
+            </div>
+            <h1 style="margin: 0 0 12px; font-size: 20px; line-height: 1.3; color: #0f172a;">
+              Hi ${user.name || user.email},
+            </h1>
+            <p style="margin: 0 0 8px; font-size: 14px; color: #4b5563;">
+              We received a request to reset the password for your account.
+            </p>
+            <p style="margin: 0 0 16px; font-size: 13px; color: #6b7280;">
+              If you made this request, please click the button below to set a new password.
+              This link will expire in 1 hour.
+            </p>
+            <div style="margin: 18px 0 20px; text-align: center;">
+              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; border-radius: 999px; background: linear-gradient(90deg,#4f46e5,#6366f1); color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none;">
+                Reset your password
+              </a>
+            </div>
+            <p style="margin: 0 0 16px; font-size: 12px; color: #9ca3af;">
+              If you did not request a password reset, you can safely ignore this email.
+            </p>
+          </div>
+        </div>
+      `;
+
+      await this.mailer.sendMail({
+        to: user.email,
+        subject: 'Password Reset Request',
+        html,
+      });
+
+      return {
+        success: true,
+        message: 'Password reset link has been sent to your email.',
+      };
+    } catch (error) {
+      console.error('Failed to send customer password reset email:', error);
+      throw new BadRequestException(
+        'Failed to send password reset email. Please try again later.',
+      );
+    }
+  }
+
+  async resetPassword(userId: number, token: string, password: string, confirmPassword: string, companyId: string) {
+    if (!companyId) {
+      throw new BadRequestException('CompanyId is required');
+    }
+
+    if (password !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await this.repository.findOne({
+      where: {
+        id: userId,
+        companyId,
+        resetPasswordToken: resetTokenHash,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    if (!user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+      throw new BadRequestException('Reset token has expired. Please request a new one.');
+    }
+
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = this.hashPassword(password, salt);
+    user.passwordSalt = salt;
+    user.passwordHash = hash;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await this.repository.save(user);
+
+    return {
+      success: true,
+      message: 'Password has been reset successfully. You can now login with your new password.',
+    };
   }
 }
