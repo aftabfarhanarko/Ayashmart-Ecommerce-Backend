@@ -907,16 +907,11 @@ export class ProductService {
         isFlashSell: true,
         deletedAt: IsNull(),
         companyId,
+        // Consider any non‑expired flash sell as "active" set:
+        // (includes both currently running and upcoming if startTime is in the future)
+        flashSellEndTime: MoreThanOrEqual(now),
       },
       relations: ["category"],
-    }).then(products => {
-      // Filter products that are currently within the flash sell time range
-      return products.filter(product => {
-        if (!product.flashSellStartTime || !product.flashSellEndTime) {
-          return false;
-        }
-        return now >= product.flashSellStartTime && now <= product.flashSellEndTime;
-      });
     });
   }
 
