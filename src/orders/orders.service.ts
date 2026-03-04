@@ -116,6 +116,8 @@ export class OrderService {
       order.customerEmail = customer?.email ?? createDto.customerEmail ?? undefined;
       // Use shippingAddress if provided, otherwise use customerAddress or customer's address
       order.customerAddress = createDto.shippingAddress ?? customer?.address ?? createDto.customerAddress ?? "";
+      // Save any additional order information (e.g. tShirtSize from storefront)
+      order.orderInfo = createDto.orderInfo ?? undefined;
       order.status = "pending";
       order.paymentMethod = createDto.paymentMethod ?? "DIRECT";
       order.deliveryType = createDto.deliveryType ?? "INSIDEDHAKA";
