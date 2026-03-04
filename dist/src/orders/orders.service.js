@@ -76,11 +76,27 @@ let OrderService = class OrderService {
                 }
             }
             else if (createDto.customerEmail?.trim()) {
-                const userByEmail = await this.userRepo.findOne({
-                    where: { email: createDto.customerEmail.trim(), companyId },
+                const email = createDto.customerEmail.trim();
+                let userByEmail = await this.userRepo.findOne({
+                    where: { email, companyId },
                 });
-                if (userByEmail?.isBanned) {
-                    throw new common_1.BadRequestException("Your account has been banned. You cannot create orders.");
+                if (userByEmail) {
+                    if (userByEmail.isBanned) {
+                        throw new common_1.BadRequestException("Your account has been banned. You cannot create orders.");
+                    }
+                    customer = userByEmail;
+                }
+                else {
+                    const newCustomer = this.userRepo.create({
+                        name: createDto.customerName ?? "",
+                        email,
+                        phone: createDto.customerPhone ?? "",
+                        address: createDto.shippingAddress ?? createDto.customerAddress ?? "",
+                        role: "customer",
+                        isActive: true,
+                        companyId,
+                    });
+                    customer = await this.userRepo.save(newCustomer);
                 }
             }
             const order = new order_entity_1.Order();
@@ -438,6 +454,14 @@ let OrderService = class OrderService {
     async cancelOrder(id, companyId, comment, performedByUserId) {
         const order = await this.findOne(id, companyId);
         const previousStatus = order.status;
+        if (!performedByUserId) {
+            const created = new Date(order.createdAt);
+            const now = new Date();
+            const hoursDiff = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
+            if (hoursDiff > 24) {
+                throw new common_1.BadRequestException("Order can only be cancelled within 24 hours of placement");
+            }
+        }
         if (order.status === "cancelled")
             throw new common_1.BadRequestException("Already cancelled");
         if (order.status === "refunded")
@@ -840,7 +864,7 @@ let OrderService = class OrderService {
                     break;
                 case "processing": {
                     subject = `Order #${order.id} is now being processed`;
-                    const frontendBase = 'https://xinzo.shop';
+                    const frontendBase = 'https://www.fiberace.shop';
                     const trackingId = order.shippingTrackingId ?? undefined;
                     const trackingUrl = frontendBase && trackingId
                         ? `${frontendBase.replace(/\/+$/, "")}/order-tracking?trackingId=${encodeURIComponent(trackingId)}`
@@ -860,7 +884,7 @@ let OrderService = class OrderService {
                     return;
             }
             await this.mailer.sendMail({
-                from: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@squadcart.com",
+                from: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@innowavecart.com",
                 to: email,
                 subject,
                 html,

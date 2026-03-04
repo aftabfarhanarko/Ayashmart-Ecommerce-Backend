@@ -1,4 +1,4 @@
-export declare const TXT_VERIFICATION_PREFIX = "_squadcart-verify";
+export declare const TXT_VERIFICATION_PREFIX = "_innowavecart-verify";
 export declare class DnsVerificationService {
     private readonly logger;
     getTxtRecordHost(apexDomain: string): string;

@@ -48,6 +48,9 @@ export class Order {
   @Column({ nullable: true })
   paymentReference?: string;
 
+  @Column('json', { nullable: true })
+  orderInfo?: string;
+
   @Column({ default: "DIRECT" })
   paymentMethod: "DIRECT" | "COD";
 

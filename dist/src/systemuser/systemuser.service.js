@@ -108,7 +108,7 @@ let SystemuserService = class SystemuserService {
         if (!user || !user.subdomain) {
             return;
         }
-        const mainDomain = 'console.squadcart.app';
+        const mainDomain = 'console.innowavecart.app';
         const subdomainUrl = `https://${user.subdomain}.${mainDomain}`;
         const tempPassword = crypto.randomBytes(8).toString('hex');
         const salt = crypto.randomBytes(16).toString('hex');
@@ -182,11 +182,11 @@ let SystemuserService = class SystemuserService {
         }
         const mainDomain = this.configService.get('MAIN_DOMAIN') ||
             process.env.MAIN_DOMAIN ||
-            'console.squadcart.app';
+            'console.innowavecart.app';
         const fullSubdomain = `${user.subdomain}.${mainDomain}`;
         console.log(`✅ Subdomain "${fullSubdomain}" ready`);
         console.log('📋 Railway will route automatically via wildcard DNS');
-        console.log('💡 Ensure wildcard DNS is configured: *.console.squadcart.app → Railway service');
+        console.log('💡 Ensure wildcard DNS is configured: *.console.innowavecart.app → Railway service');
         console.log('💡 Railway will automatically provision SSL certificate');
     }
     async provisionCustomDomainInRailway(userId) {
@@ -278,7 +278,14 @@ let SystemuserService = class SystemuserService {
                 throw new common_1.BadRequestException('Only Super Admin or System Owner can create System Owner');
             }
         }
-        const companyId = creatorCompanyId || await this.companyIdService.generateNextCompanyId();
+        const dtoCompanyId = dto.companyId;
+        let companyId;
+        if (role === system_user_role_enum_1.SystemUserRole.RESELLER && dtoCompanyId && typeof dtoCompanyId === 'string') {
+            companyId = dtoCompanyId.trim();
+        }
+        else {
+            companyId = creatorCompanyId || (await this.companyIdService.generateNextCompanyId());
+        }
         const salt = crypto.randomBytes(16).toString('hex');
         const hash = this.hashPassword(dto.password, salt);
         let permissions = dto.permissions || [];
@@ -574,7 +581,7 @@ let SystemuserService = class SystemuserService {
                 const subject = `${subjectPrefix}Your account is now active`;
                 const greetingName = updatedUser.name || updatedUser.email;
                 const loginUrl = this.configService.get('RESELLER_LOGIN_URL') ||
-                    'https://xinzo.shop';
+                    'https://www.fiberace.shop';
                 const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f4f4f5; padding: 24px;">
             <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px 24px 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.12);">
@@ -843,7 +850,7 @@ let SystemuserService = class SystemuserService {
         user.resetPasswordToken = resetTokenHash;
         user.resetPasswordExpires = resetTokenExpiry;
         await this.systemUserRepo.save(user);
-        const frontendUrl = process.env.FRONTEND_URL || 'https://squadcart-console.up.railway.app';
+        const frontendUrl = 'https://www.fiberace.shop';
         const resetLink = `${frontendUrl}/reset-password?id=${user.id}&token=${resetToken}`;
         try {
             const html = email_templates_1.EmailTemplates.getPasswordResetTemplate(user, resetLink);

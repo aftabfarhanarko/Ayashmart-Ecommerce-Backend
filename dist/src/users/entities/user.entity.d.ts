@@ -20,4 +20,6 @@ export declare class User {
     companyId: string;
     passwordHash?: string;
     passwordSalt?: string;
+    resetPasswordToken?: string | null;
+    resetPasswordExpires?: Date | null;
 }

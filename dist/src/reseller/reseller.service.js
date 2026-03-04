@@ -139,7 +139,7 @@ let ResellerService = class ResellerService {
             });
             if (reseller?.email) {
                 const loginUrl = this.configService.get('RESELLER_LOGIN_URL') ||
-                    'https://xinzo.shop';
+                    'https://www.fiberace.shop';
                 const amount = Number(saved.amount).toFixed(2);
                 const requestedAt = saved.createdAt
                     ? saved.createdAt.toISOString().slice(0, 19).replace('T', ' ')
@@ -257,7 +257,7 @@ let ResellerService = class ResellerService {
             });
             if (reseller?.email) {
                 const loginUrl = this.configService.get('RESELLER_LOGIN_URL') ||
-                    'https://xinzo.shop';
+                    'https://www.fiberace.shop';
                 const amount = Number(saved.amount).toFixed(2);
                 const paidAt = saved.paidAt
                     ? saved.paidAt.toISOString().slice(0, 19).replace('T', ' ')
@@ -380,7 +380,7 @@ let ResellerService = class ResellerService {
         const saved = await this.systemUserRepo.save(reseller);
         try {
             const loginUrl = this.configService.get('RESELLER_LOGIN_URL') ||
-                'https://xinzo.shop';
+                'https://www.fiberace.shop';
             const html = `
         <p>Hi ${saved.name || 'there'},</p>
         <p>Your reseller account has been <strong>approved</strong>.</p>

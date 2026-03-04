@@ -14,6 +14,11 @@ export class CreateOrderDto {
   @IsInt()
   customerId?: number;
 
+  
+  @IsOptional()
+  @IsString()
+  orderInfo?: string;
+
   @IsOptional()
   @IsString()
   customerName?: string;

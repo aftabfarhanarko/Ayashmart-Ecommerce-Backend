@@ -26,6 +26,7 @@ const domain_controller_1 = require("./domain.controller");
 const dns_verification_service_1 = require("./dns-verification.service");
 const cloudflare_custom_domain_service_1 = require("./cloudflare-custom-domain.service");
 const domain_verification_cron_service_1 = require("./domain-verification-cron.service");
+const users_module_1 = require("../users/users.module");
 let SystemuserModule = class SystemuserModule {
 };
 exports.SystemuserModule = SystemuserModule;
@@ -39,6 +40,7 @@ exports.SystemuserModule = SystemuserModule = __decorate([
                 signOptions: { expiresIn: '24d' },
             }),
             superadmin_module_1.SuperadminModule,
+            users_module_1.UsersModule,
         ],
         controllers: [systemuser_controller_1.SystemuserController, auth_controller_1.AuthController, domain_controller_1.DomainController],
         providers: [

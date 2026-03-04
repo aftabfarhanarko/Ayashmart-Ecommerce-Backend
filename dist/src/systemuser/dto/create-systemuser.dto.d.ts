@@ -23,4 +23,5 @@ export declare class CreateSystemuserDto {
     permissions?: FeaturePermission[];
     role?: SystemUserRole;
     resellerCommissionRate?: number;
+    companyId?: string;
 }

@@ -114,4 +114,9 @@ __decorate([
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateSystemuserDto.prototype, "resellerCommissionRate", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateSystemuserDto.prototype, "companyId", void 0);
 //# sourceMappingURL=create-systemuser.dto.js.map

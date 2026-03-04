@@ -38,11 +38,50 @@ let UsersController = class UsersController {
             throw new common_1.BadRequestException('Password is required');
         }
         const user = await this.usersService.create(createUserDto, companyId);
-        return { statusCode: common_1.HttpStatus.CREATED, message: 'User registered successfully', data: user };
+        let accessToken;
+        let safeUser = user;
+        try {
+            const loginResult = await this.usersService.login(createUserDto.email, createUserDto.password, companyId);
+            accessToken = loginResult.accessToken;
+            safeUser = loginResult.user;
+        }
+        catch (e) {
+            console.error('Auto-login after register failed:', e);
+        }
+        return {
+            statusCode: common_1.HttpStatus.CREATED,
+            message: 'User registered successfully',
+            data: user,
+            ...(accessToken && safeUser ? { accessToken, user: safeUser } : {}),
+        };
     }
     async login(loginDto) {
         const { accessToken, user } = await this.usersService.login(loginDto.email, loginDto.password, loginDto.companyId);
         return { statusCode: common_1.HttpStatus.OK, message: 'Login successful', accessToken, user };
+    }
+    async forgotPassword(body, companyIdFromQuery) {
+        const companyId = body.companyId || companyIdFromQuery;
+        if (!companyId) {
+            throw new common_1.BadRequestException('CompanyId is required');
+        }
+        const result = await this.usersService.requestPasswordReset(body.email, companyId);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: result.message,
+            data: { success: result.success, message: result.message },
+        };
+    }
+    async resetPassword(userId, token, body, companyIdFromQuery) {
+        const companyId = body.companyId || companyIdFromQuery;
+        if (!companyId) {
+            throw new common_1.BadRequestException('CompanyId is required');
+        }
+        const result = await this.usersService.resetPassword(userId, token, body.password, body.confirmPassword, companyId);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: result.message,
+            data: result,
+        };
     }
     async create(body, companyIdFromQuery) {
         const companyId = body.companyId || companyIdFromQuery;
@@ -51,7 +90,24 @@ let UsersController = class UsersController {
             throw new common_1.BadRequestException('CompanyId is required');
         }
         const user = await this.usersService.create(createUserDto, companyId);
-        return { statusCode: common_1.HttpStatus.CREATED, message: 'User created', data: user };
+        let accessToken;
+        let safeUser = user;
+        if (createUserDto.password) {
+            try {
+                const loginResult = await this.usersService.login(createUserDto.email, createUserDto.password, companyId);
+                accessToken = loginResult.accessToken;
+                safeUser = loginResult.user;
+            }
+            catch (e) {
+                console.error('Auto-login after user create failed:', e);
+            }
+        }
+        return {
+            statusCode: common_1.HttpStatus.CREATED,
+            message: 'User created',
+            data: user,
+            ...(accessToken && safeUser ? { accessToken, user: safeUser } : {}),
+        };
     }
     async getCurrentUser(userId, companyId) {
         const user = await this.usersService.findOne(userId, companyId);
@@ -114,6 +170,28 @@ __decorate([
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('companyId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('reset-password/:userId/:token'),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Param)('userId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Param)('token')),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.Query)('companyId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object, String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "resetPassword", null);
 __decorate([
     (0, common_1.Post)(),
     (0, public_decorator_1.Public)(),

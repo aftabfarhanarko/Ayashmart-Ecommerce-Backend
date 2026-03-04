@@ -31,6 +31,11 @@ let SubdomainMiddleware = class SubdomainMiddleware {
         if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) {
             return next();
         }
+        const defaultApiHost = (process.env.DEFAULT_API_HOST || process.env.API_DOMAIN || 'e-api-omega.vercel.app').toLowerCase();
+        const normalizedHostForCompare = hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+        if (normalizedHostForCompare === defaultApiHost) {
+            return next();
+        }
         const normalizedHost = hostname.startsWith('www.') ? hostname.slice(4) : hostname;
         const parts = normalizedHost.split('.');
         let subdomain = '';

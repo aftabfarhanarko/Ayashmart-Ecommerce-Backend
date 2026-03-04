@@ -14,7 +14,7 @@ const util_1 = require("util");
 const resolveTxt = (0, util_1.promisify)(dns.resolveTxt);
 const resolveCname = (0, util_1.promisify)(dns.resolveCname);
 const resolve4 = (0, util_1.promisify)(dns.resolve4);
-exports.TXT_VERIFICATION_PREFIX = '_squadcart-verify';
+exports.TXT_VERIFICATION_PREFIX = '_innowavecart-verify';
 let DnsVerificationService = DnsVerificationService_1 = class DnsVerificationService {
     constructor() {
         this.logger = new common_1.Logger(DnsVerificationService_1.name);

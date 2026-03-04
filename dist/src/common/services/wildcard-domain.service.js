@@ -40,7 +40,7 @@ let WildcardDomainService = WildcardDomainService_1 = class WildcardDomainServic
             null);
     }
     get mainDomain() {
-        return this.configService.get('MAIN_DOMAIN') ?? 'console.squadcart.app';
+        return this.configService.get('MAIN_DOMAIN') ?? 'console.innowavecart.app';
     }
     isConfigured() {
         return Boolean(this.zoneId &&
@@ -66,7 +66,7 @@ let WildcardDomainService = WildcardDomainService_1 = class WildcardDomainServic
                 params: { type: 'CNAME' },
             });
             const records = listRes.data?.result ?? [];
-            const zoneApex = mainDomain.includes('.') ? mainDomain.split('.').slice(-2).join('.') : 'squadcart.app';
+            const zoneApex = mainDomain.includes('.') ? mainDomain.split('.').slice(-2).join('.') : 'innowavecart.app';
             const wildcardFqdn = `${wildcardName}.${zoneApex}`;
             const existing = Array.isArray(records)
                 ? records.find((r) => r.name === wildcardFqdn)

@@ -4,6 +4,7 @@ declare class OrderItemDto {
 }
 export declare class CreateOrderDto {
     customerId?: number;
+    orderInfo?: string;
     customerName?: string;
     customerPhone?: string;
     customerEmail?: string;

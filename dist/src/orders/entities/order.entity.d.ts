@@ -26,6 +26,7 @@ export declare class Order {
     paidAmount: number;
     status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded";
     paymentReference?: string;
+    orderInfo?: string;
     paymentMethod: "DIRECT" | "COD";
     shippingTrackingId?: string;
     shippingProvider?: string;

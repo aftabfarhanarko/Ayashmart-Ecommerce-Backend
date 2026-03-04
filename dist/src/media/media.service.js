@@ -19,6 +19,8 @@ const typeorm_2 = require("typeorm");
 const media_entity_1 = require("./entities/media.entity");
 const fs = require("fs");
 const path = require("path");
+const axios_1 = require("axios");
+const form_data_1 = require("form-data");
 let MediaService = class MediaService {
     constructor(mediaRepository) {
         this.mediaRepository = mediaRepository;
@@ -34,12 +36,10 @@ let MediaService = class MediaService {
         return this.mediaRepository.save(media);
     }
     async uploadFile(file, companyId) {
-        if (!companyId) {
+        if (!companyId)
             throw new common_1.BadRequestException('CompanyId is required');
-        }
-        if (!file) {
+        if (!file)
             throw new common_1.BadRequestException('File is required');
-        }
         const allowedMimeTypes = [
             'image/jpeg',
             'image/jpg',
@@ -54,17 +54,50 @@ let MediaService = class MediaService {
         if (file.size > maxSize) {
             throw new common_1.BadRequestException('File size must be less than 20MB');
         }
-        const ext = path.extname(file.originalname) || '.jpg';
-        const type = ext.toUpperCase().replace('.', '');
+        const mimeToExt = {
+            'image/jpeg': 'JPG',
+            'image/jpg': 'JPG',
+            'image/png': 'PNG',
+            'image/webp': 'WEBP',
+            'image/gif': 'GIF',
+        };
+        const type = mimeToExt[file.mimetype];
+        const ext = path.extname(file.originalname) || `.${type.toLowerCase()}`;
+        const rawName = path.basename(file.originalname, ext);
+        const title = rawName.replace(/[^a-zA-Z0-9-_]/g, '_') || `image_${Date.now()}`;
         const size = this.formatFileSize(file.size);
-        const title = path.basename(file.originalname, ext) || `image_${Date.now()}`;
+        const cdnUploadUrl = process.env.CDN_UPLOAD_URL ||
+            'https://e-cdn.vercel.app/upload/image';
+        let cdnUrl;
+        try {
+            const formData = new form_data_1.default();
+            formData.append('file', file.buffer, {
+                filename: file.originalname || 'image.jpg',
+                contentType: file.mimetype,
+            });
+            const response = await axios_1.default.post(cdnUploadUrl, formData, {
+                headers: formData.getHeaders(),
+            });
+            const data = response?.data;
+            if (!data?.success || !data.url) {
+                throw new common_1.BadRequestException(data?.message || 'CDN upload response invalid');
+            }
+            cdnUrl = data.url || data.secure_url || data.path;
+        }
+        catch (error) {
+            console.error('[MediaService] CDN upload failed', error);
+            throw new common_1.BadRequestException('Failed to upload image to CDN');
+        }
+        if (!cdnUrl) {
+            throw new common_1.BadRequestException('CDN did not return a URL');
+        }
         const media = this.mediaRepository.create({
             title,
             type,
             size,
-            url: `/uploads/media/${file.filename}`,
+            url: cdnUrl,
             companyId,
-            filename: file.filename,
+            filename: file.originalname,
         });
         return this.mediaRepository.save(media);
     }

@@ -35,7 +35,7 @@ let MediaController = class MediaController {
             throw new common_1.BadRequestException('File is required');
         }
         const media = await this.mediaService.uploadFile(file, companyId);
-        const baseUrl = 'https://squadcart-backend.up.railway.app';
+        const baseUrl = 'https://e-cdn.vercel.app';
         const fullUrl = media.url.startsWith('http') ? media.url : `${baseUrl}${media.url}`;
         return {
             statusCode: common_1.HttpStatus.CREATED,
@@ -66,7 +66,9 @@ let MediaController = class MediaController {
             page: page ? parseInt(page, 10) : 1,
             limit: limit ? parseInt(limit, 10) : 24,
         });
-        const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
+        const baseUrl = process.env.CDN_BASE_URL ||
+            process.env.API_BASE_URL ||
+            'http://localhost:8000';
         const data = result.data.map((m) => ({
             ...m,
             url: m.url.startsWith('http') ? m.url : `${baseUrl}${m.url}`,
@@ -89,7 +91,9 @@ let MediaController = class MediaController {
         if (!media) {
             return { statusCode: common_1.HttpStatus.NOT_FOUND, message: 'Media not found' };
         }
-        const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
+        const baseUrl = process.env.CDN_BASE_URL ||
+            process.env.API_BASE_URL ||
+            'http://localhost:8000';
         const url = media.url.startsWith('http') ? media.url : `${baseUrl}${media.url}`;
         return {
             statusCode: common_1.HttpStatus.OK,

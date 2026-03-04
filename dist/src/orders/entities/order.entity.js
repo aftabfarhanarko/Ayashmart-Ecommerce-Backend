@@ -60,6 +60,10 @@ __decorate([
     __metadata("design:type", String)
 ], Order.prototype, "paymentReference", void 0);
 __decorate([
+    (0, typeorm_1.Column)('json', { nullable: true }),
+    __metadata("design:type", String)
+], Order.prototype, "orderInfo", void 0);
+__decorate([
     (0, typeorm_1.Column)({ default: "DIRECT" }),
     __metadata("design:type", String)
 ], Order.prototype, "paymentMethod", void 0);

@@ -14,19 +14,41 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
 const systemuser_service_1 = require("./systemuser.service");
+const users_service_1 = require("../users/users.service");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor(systemuserService) {
+    constructor(systemuserService, usersService) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
             secretOrKey: process.env.JWT_SECRET || 'change-me-in-prod',
         });
         this.systemuserService = systemuserService;
+        this.usersService = usersService;
     }
     async validate(payload) {
         const userId = payload.userId || payload.sub;
         if (!userId) {
             return null;
+        }
+        const role = payload.role;
+        const companyId = payload.companyId;
+        if (role === 'customer' && companyId) {
+            try {
+                const customer = await this.usersService.findOne(Number(userId), companyId);
+                if (!customer || !customer.isActive || customer.isBanned) {
+                    return null;
+                }
+                return {
+                    userId: customer.id,
+                    companyId: customer.companyId,
+                    email: customer.email,
+                    name: customer.name,
+                    role: customer.role ?? 'customer',
+                };
+            }
+            catch {
+                return null;
+            }
         }
         try {
             const user = await this.systemuserService.findOne(Number(userId));
@@ -49,6 +71,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [systemuser_service_1.SystemuserService])
+    __metadata("design:paramtypes", [systemuser_service_1.SystemuserService,
+        users_service_1.UsersService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

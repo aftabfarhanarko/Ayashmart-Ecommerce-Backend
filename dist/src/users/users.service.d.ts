@@ -9,8 +9,13 @@ export declare class UsersService {
     private readonly dataSource;
     private readonly jwtService;
     private readonly notificationsService;
+    private readonly mailer;
     private get repository();
-    constructor(userRepo: Repository<User>, dataSource: DataSource, jwtService: JwtService, notificationsService: NotificationsService);
+    constructor(userRepo: Repository<User>, dataSource: DataSource, jwtService: JwtService, notificationsService: NotificationsService, mailer: {
+        sendMail: (message: any) => Promise<{
+            id?: string;
+        }>;
+    });
     private hashPassword;
     create(createUserDto: CreateUserDto, companyId: string): Promise<User>;
     findAll(companyId: string, filters?: {
@@ -34,5 +39,13 @@ export declare class UsersService {
     login(email: string, password: string, companyId: string): Promise<{
         accessToken: string;
         user: any;
+    }>;
+    requestPasswordReset(email: string, companyId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
+    resetPassword(userId: number, token: string, password: string, confirmPassword: string, companyId: string): Promise<{
+        success: boolean;
+        message: string;
     }>;
 }
