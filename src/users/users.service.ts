@@ -313,7 +313,7 @@ export class UsersService {
       const html = `
         <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f9fafb; padding: 24px;">
           <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px 24px 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.12);">
-            <div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #6366f1; font-weight: 600; margin-bottom: 6px;">
+            <div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; font-weight: 600; margin-bottom: 6px;">
               Password reset
             </div>
             <h1 style="margin: 0 0 12px; font-size: 20px; line-height: 1.3; color: #0f172a;">
@@ -327,7 +327,7 @@ export class UsersService {
               This link will expire in 1 hour.
             </p>
             <div style="margin: 18px 0 20px; text-align: center;">
-              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; border-radius: 999px; background: linear-gradient(90deg,#4f46e5,#6366f1); color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none;">
+              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; border-radius: 999px; background: linear-gradient(90deg,#ffffff,#111111); color: #000000; font-size: 14px; font-weight: 600; text-decoration: none;">
                 Reset your password
               </a>
             </div>
