@@ -6,6 +6,7 @@ import { CompanyIdGuard } from '../common/guards/company-id.guard';
 import { CompanyId } from '../common/decorators/company-id.decorator';
 import { UserId } from '../common/decorators/user-id.decorator';
 import { SystemUserRole } from '../systemuser/system-user-role.enum';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller("orders")
 @UseGuards(JwtAuthGuard, CompanyIdGuard)
@@ -13,6 +14,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
   @Post()
+  @Public()
   async create(
     @Body() dto: CreateOrderDto,
     @Query('companyId') companyIdFromQuery?: string,
