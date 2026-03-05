@@ -118,6 +118,32 @@ export class UsersController {
     };
   }
 
+  // Public endpoint for initial password setup for guest-created accounts
+  @Post('initial-set-password')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  async initialSetPassword(
+    @Body() body: { email: string; password: string; confirmPassword: string; orderId?: number; companyId?: string },
+    @Query('companyId') companyIdFromQuery?: string,
+  ) {
+    const companyId = body.companyId || companyIdFromQuery;
+    if (!companyId) {
+      throw new BadRequestException('CompanyId is required');
+    }
+    const result = await this.usersService.initialSetPassword({
+      email: body.email,
+      companyId,
+      password: body.password,
+      confirmPassword: body.confirmPassword,
+      orderId: body.orderId,
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
+      data: result,
+    };
+  }
+
   @Post()
   @Public()
   @HttpCode(HttpStatus.CREATED)

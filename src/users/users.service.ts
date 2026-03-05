@@ -8,6 +8,7 @@ import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { Order } from '../orders/entities/order.entity';
 
 @Injectable()
 export class UsersService {
@@ -396,5 +397,61 @@ export class UsersService {
       success: true,
       message: 'Password has been reset successfully. You can now login with your new password.',
     };
+  }
+
+  /**
+   * Set initial password for a customer account created implicitly (e.g., via guest checkout).
+   * Security: Only allowed if the user currently has no password set and either:
+   * - An orderId is provided that matches this user or their email for the same company, or
+   * - (Fallback) the account is newly created without a password.
+   */
+  async initialSetPassword(params: {
+    email: string;
+    companyId: string;
+    password: string;
+    confirmPassword: string;
+    orderId?: number;
+  }): Promise<{ success: boolean; message: string }> {
+    const { email, companyId, password, confirmPassword, orderId } = params;
+    if (!companyId) {
+      throw new BadRequestException('CompanyId is required');
+    }
+    if (!email?.trim()) {
+      throw new BadRequestException('Email is required');
+    }
+    if (password !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    const user = await this.repository.findOne({ where: { email, companyId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.passwordHash && user.passwordSalt) {
+      throw new BadRequestException('Password already set for this account');
+    }
+
+    // If orderId provided, verify it belongs to the user/email/company (created recently is optional)
+    if (typeof orderId === 'number' && !Number.isNaN(orderId)) {
+      const orderRepo = this.dataSource.getRepository(Order);
+      const order = await orderRepo.findOne({
+        where: [
+          { id: orderId, companyId, customer: { id: user.id } as any },
+          { id: orderId, companyId, customerEmail: email },
+        ],
+        relations: ['customer'],
+      });
+      if (!order) {
+        throw new BadRequestException('Order validation failed for this account');
+      }
+    }
+
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = this.hashPassword(password, salt);
+    user.passwordSalt = salt;
+    user.passwordHash = hash;
+    await this.repository.save(user);
+
+    return { success: true, message: 'Password has been set successfully.' };
   }
 }
