@@ -21,6 +21,7 @@ const company_id_guard_1 = require("../common/guards/company-id.guard");
 const company_id_decorator_1 = require("../common/decorators/company-id.decorator");
 const user_id_decorator_1 = require("../common/decorators/user-id.decorator");
 const system_user_role_enum_1 = require("../systemuser/system-user-role.enum");
+const public_decorator_1 = require("../common/decorators/public.decorator");
 let OrderController = class OrderController {
     constructor(orderService) {
         this.orderService = orderService;
@@ -126,6 +127,7 @@ let OrderController = class OrderController {
 exports.OrderController = OrderController;
 __decorate([
     (0, common_1.Post)(),
+    (0, public_decorator_1.Public)(),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Query)('companyId')),
     __param(2, (0, company_id_decorator_1.CompanyId)()),

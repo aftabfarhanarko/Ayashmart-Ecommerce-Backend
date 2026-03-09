@@ -585,7 +585,7 @@ let SystemuserService = class SystemuserService {
                 const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f4f4f5; padding: 24px;">
             <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px 24px 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.12);">
-              <div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #6366f1; font-weight: 600; margin-bottom: 6px;">
+              <div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; font-weight: 600; margin-bottom: 6px;">
                 Account activated
               </div>
               <h1 style="margin: 0 0 12px; font-size: 20px; line-height: 1.3; color: #0f172a;">
@@ -599,14 +599,14 @@ let SystemuserService = class SystemuserService {
               </p>
 
               <div style="margin: 18px 0 20px; text-align: center;">
-                <a href="${loginUrl}" style="display: inline-block; padding: 10px 20px; border-radius: 999px; background: linear-gradient(90deg,#4f46e5,#6366f1); color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none;">
+                <a href="${loginUrl}" style="display: inline-block; padding: 10px 20px; border-radius: 999px; background: linear-gradient(90deg,#ffffff,#111111); color: #000000; font-size: 14px; font-weight: 600; text-decoration: none;">
                   Go to dashboard
                 </a>
               </div>
 
               <div style="border-top: 1px solid #e5e7eb; margin-top: 16px; padding-top: 12px;">
                 <p style="margin: 0 0 4px; font-size: 11px; color: #9ca3af;">
-                  Login URL: <a href="${loginUrl}" style="color: #4f46e5; text-decoration: none;">${loginUrl}</a>
+                  Login URL: <a href="${loginUrl}" style="color: #000000; text-decoration: underline;">${loginUrl}</a>
                 </p>
                 <p style="margin: 0; font-size: 11px; color: #9ca3af;">
                   If you did not expect this email, you can ignore it.

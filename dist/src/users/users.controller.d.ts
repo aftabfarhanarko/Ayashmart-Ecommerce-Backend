@@ -45,6 +45,20 @@ export declare class UsersController {
             message: string;
         };
     }>;
+    initialSetPassword(body: {
+        email: string;
+        password: string;
+        confirmPassword: string;
+        orderId?: number;
+        companyId?: string;
+    }, companyIdFromQuery?: string): Promise<{
+        statusCode: HttpStatus;
+        message: string;
+        data: {
+            success: boolean;
+            message: string;
+        };
+    }>;
     create(body: CreateUserDto & {
         companyId?: string;
     }, companyIdFromQuery?: string): Promise<{

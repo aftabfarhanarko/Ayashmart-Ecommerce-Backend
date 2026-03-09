@@ -771,15 +771,9 @@ let ProductService = class ProductService {
                 isFlashSell: true,
                 deletedAt: (0, typeorm_2.IsNull)(),
                 companyId,
+                flashSellEndTime: (0, typeorm_2.MoreThanOrEqual)(now),
             },
             relations: ["category"],
-        }).then(products => {
-            return products.filter(product => {
-                if (!product.flashSellStartTime || !product.flashSellEndTime) {
-                    return false;
-                }
-                return now >= product.flashSellStartTime && now <= product.flashSellEndTime;
-            });
         });
     }
     async getStockHistory(productId, companyId, limit = 50) {

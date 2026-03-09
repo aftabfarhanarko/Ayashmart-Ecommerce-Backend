@@ -118,6 +118,18 @@ export declare class ProductController {
         message: string;
         data: import("./entities/product.entity").ProductEntity;
     }>;
+    setFlashSell(flashSellDto: FlashSellDto, companyId: string): Promise<{
+        statusCode: HttpStatus;
+        message: string;
+        data: import("./entities/product.entity").ProductEntity[];
+    }>;
+    removeFlashSell(body: {
+        productIds: number[];
+    }, companyId: string): Promise<{
+        statusCode: HttpStatus;
+        message: string;
+        data: import("./entities/product.entity").ProductEntity[];
+    }>;
     softDelete(id: number, companyId: string, req?: any): Promise<{
         statusCode: HttpStatus;
         message: string;
@@ -140,18 +152,6 @@ export declare class ProductController {
         statusCode: HttpStatus;
         message: string;
         data: import("./entities/product.entity").ProductEntity;
-    }>;
-    setFlashSell(flashSellDto: FlashSellDto, companyId: string): Promise<{
-        statusCode: HttpStatus;
-        message: string;
-        data: import("./entities/product.entity").ProductEntity[];
-    }>;
-    removeFlashSell(body: {
-        productIds: number[];
-    }, companyId: string): Promise<{
-        statusCode: HttpStatus;
-        message: string;
-        data: import("./entities/product.entity").ProductEntity[];
     }>;
     getActiveFlashSellProducts(companyIdFromQuery?: string, companyIdFromToken?: string): Promise<{
         statusCode: HttpStatus;

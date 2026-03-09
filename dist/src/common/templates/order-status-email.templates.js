@@ -5,12 +5,12 @@ exports.generateOrderProcessingEmail = generateOrderProcessingEmail;
 exports.generateOrderShippedEmail = generateOrderShippedEmail;
 exports.generateOrderDeliveredEmail = generateOrderDeliveredEmail;
 const baseStyles = {
-    wrapper: 'margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0f172a;',
-    outerTable: 'background: radial-gradient(circle at top, #1d4ed8, #020617 55%); padding: 24px 0;',
-    container: 'background-color: #020617; border-radius: 18px; overflow: hidden; max-width: 640px; width: 100%; border: 1px solid rgba(148,163,184,0.45);',
+    wrapper: 'margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000000; color: #ffffff;',
+    outerTable: 'background: radial-gradient(circle at top, #f5f5f5, #000000 55%); padding: 24px 0;',
+    container: 'background-color: #000000; border-radius: 18px; overflow: hidden; max-width: 640px; width: 100%; border: 1px solid #444444;',
     header: 'padding: 20px 26px 16px;',
     content: 'padding: 24px 26px 26px;',
-    footer: 'background-color: #020617; padding: 16px 26px 20px; text-align: center; border-top: 1px solid rgba(55,65,81,0.9);',
+    footer: 'background-color: #000000; padding: 16px 26px 20px; text-align: center; border-top: 1px solid #444444;',
 };
 function generateOrderPlacedEmail(customerName, orderId, totalAmount, productList, storeName) {
     const amount = Number(totalAmount);
@@ -23,50 +23,50 @@ function generateOrderPlacedEmail(customerName, orderId, totalAmount, productLis
     <tr><td align="center">
       <table cellpadding="0" cellspacing="0" style="${baseStyles.container}">
         <tr>
-          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #22c55e, #22d3ee); color: #e5e7eb;">
+          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #f5f5f5, #111111); color: #f5f5f5;">
             <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.9;">
               ${storeName}
             </div>
-            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #f9fafb;">
+            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #ffffff;">
               Order received ✓
             </div>
-            <p style="margin: 6px 0 0; font-size: 13px; color: #c7d2fe;">
+            <p style="margin: 6px 0 0; font-size: 13px; color: #dddddd;">
               Thank you for shopping with us. Your order is now in queue.
             </p>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.content}">
-            <p style="margin: 0 0 10px; font-size: 15px; color: #e5e7eb;">Hi ${customerName},</p>
-            <p style="margin: 0 0 16px; font-size: 14px; color: #9ca3af; line-height: 1.7;">
+            <p style="margin: 0 0 10px; font-size: 15px; color: #f5f5f5;">Hi ${customerName},</p>
+            <p style="margin: 0 0 16px; font-size: 14px; color: #cccccc; line-height: 1.7;">
               We have received your order <strong>#${orderId}</strong>. You will get updates as soon as the status changes.
             </p>
 
-            <table width="100%" cellpadding="0" cellspacing="0" style="border-radius: 14px; overflow: hidden; border: 1px solid rgba(55,65,81,0.9); background-color: #020617;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-radius: 14px; overflow: hidden; border: 1px solid #444444; background-color: #000000;">
               <tr>
                 <td style="padding: 16px 18px 14px;">
-                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #f9fafb;">Order summary</h3>
-                  <p style="margin: 3px 0; font-size: 13px; color: #e5e7eb;">
+                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #ffffff;">Order summary</h3>
+                  <p style="margin: 3px 0; font-size: 13px; color: #f5f5f5;">
                     <strong>Order ID:</strong> #${orderId}
                   </p>
-                  <p style="margin: 6px 0 10px; font-size: 13px; color: #9ca3af; line-height: 1.6;">
+                  <p style="margin: 6px 0 10px; font-size: 13px; color: #cccccc; line-height: 1.6;">
                     ${productList}
                   </p>
-                  <p style="margin: 0; font-size: 14px; color: #e5e7eb; font-weight: 600;">
+                  <p style="margin: 0; font-size: 14px; color: #ffffff; font-weight: 600;">
                     Total: ${amount.toFixed(2)} BDT
                   </p>
                 </td>
               </tr>
             </table>
 
-            <p style="margin: 18px 0 0; font-size: 12px; color: #6b7280;">
+            <p style="margin: 18px 0 0; font-size: 12px; color: #999999;">
               You will receive another email when your order is processed and shipped.
             </p>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.footer}">
-            <p style="margin: 0; font-size: 11px; color: #6b7280;">
+            <p style="margin: 0; font-size: 11px; color: #777777;">
               © ${new Date().getFullYear()} ${storeName}. All rights reserved.
             </p>
           </td>
@@ -82,7 +82,7 @@ function generateOrderProcessingEmail(customerName, orderId, storeName, tracking
         ? `<table cellpadding="0" cellspacing="0" style="margin-top: 16px;">
         <tr>
           <td>
-            <a href="${trackingUrl}" style="display: inline-block; padding: 10px 18px; border-radius: 999px; background: linear-gradient(to right, #22c55e, #22d3ee); color: #0f172a; font-size: 13px; font-weight: 600; text-decoration: none;">
+            <a href="${trackingUrl}" style="display: inline-block; padding: 10px 18px; border-radius: 999px; background: linear-gradient(to right, #ffffff, #111111); color: #000000; font-size: 13px; font-weight: 600; text-decoration: none;">
               Track your order${trackingId ? ` (#${trackingId})` : ""}
             </a>
           </td>
@@ -98,38 +98,38 @@ function generateOrderProcessingEmail(customerName, orderId, storeName, tracking
     <tr><td align="center">
       <table cellpadding="0" cellspacing="0" style="${baseStyles.container}">
         <tr>
-          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #f97316, #ec4899); color: #fee2e2;">
-            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.9;">
+          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #f5f5f5, #111111); color: #f5f5f5;">
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.9; color: #f5f5f5;">
               ${storeName}
             </div>
-            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #fef2f2;">
+            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #ffffff;">
               Order is being processed
             </div>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.content}">
-            <p style="margin: 0 0 10px; font-size: 15px; color: #e5e7eb;">Hi ${customerName},</p>
-            <p style="margin: 0 0 16px; font-size: 14px; color: #9ca3af; line-height: 1.7;">
+            <p style="margin: 0 0 10px; font-size: 15px; color: #f5f5f5;">Hi ${customerName},</p>
+            <p style="margin: 0 0 16px; font-size: 14px; color: #cccccc; line-height: 1.7;">
               Great news! Your order <strong>#${orderId}</strong> is now being prepared for shipment.
             </p>
 
-            <div style="margin-top: 4px; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(55,65,81,0.9); background-color: rgba(15,23,42,0.9);">
-              <p style="margin: 0; font-size: 13px; color: #e5e7eb;">
+            <div style="margin-top: 4px; padding: 14px 16px; border-radius: 12px; border: 1px solid #444444; background-color: #111111;">
+              <p style="margin: 0; font-size: 13px; color: #f5f5f5;">
                 We’ll send you another email with tracking details as soon as your package is on the way.
               </p>
             </div>
 
             ${trackingCta}
 
-            <p style="margin: 18px 0 0; font-size: 12px; color: #6b7280;">
+            <p style="margin: 18px 0 0; font-size: 12px; color: #999999;">
               Thank you for your patience.
             </p>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.footer}">
-            <p style="margin: 0; font-size: 11px; color: #6b7280;">
+            <p style="margin: 0; font-size: 11px; color: #777777;">
               © ${new Date().getFullYear()} ${storeName}. All rights reserved.
             </p>
           </td>
@@ -153,37 +153,37 @@ function generateOrderShippedEmail(customerName, orderId, trackingId, provider, 
     <tr><td align="center">
       <table cellpadding="0" cellspacing="0" style="${baseStyles.container}">
         <tr>
-          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #38bdf8, #0ea5e9); color: #e0f2fe;">
-            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.9;">
+          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #f5f5f5, #111111); color: #f5f5f5;">
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.9; color: #f5f5f5;">
               ${storeName}
             </div>
-            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #f9fafb;">
+            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #ffffff;">
               Your order is on the way 🚚
             </div>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.content}">
-            <p style="margin: 0 0 10px; font-size: 15px; color: #e5e7eb;">Hi ${customerName},</p>
-            <p style="margin: 0 0 14px; font-size: 14px; color: #9ca3af; line-height: 1.7;">
+            <p style="margin: 0 0 10px; font-size: 15px; color: #f5f5f5;">Hi ${customerName},</p>
+            <p style="margin: 0 0 14px; font-size: 14px; color: #cccccc; line-height: 1.7;">
               Your order <strong>#${orderId}</strong> has been shipped and is on its way to you.
             </p>
 
-            <div style="margin-top: 6px; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(55,65,81,0.9); background-color: rgba(15,23,42,0.9);">
-              <p style="margin: 0; font-size: 13px; color: #e5e7eb;">
+            <div style="margin-top: 6px; padding: 14px 16px; border-radius: 12px; border: 1px solid #444444; background-color: #111111;">
+              <p style="margin: 0; font-size: 13px; color: #f5f5f5;">
                 Estimated delivery time may vary based on the courier. You can use the tracking details below to follow your package.
               </p>
               ${trackingInfo}
             </div>
 
-            <p style="margin: 18px 0 0; font-size: 12px; color: #6b7280;">
+            <p style="margin: 18px 0 0; font-size: 12px; color: #999999;">
               Thank you for choosing ${storeName}.
             </p>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.footer}">
-            <p style="margin: 0; font-size: 11px; color: #6b7280;">
+            <p style="margin: 0; font-size: 11px; color: #777777;">
               © ${new Date().getFullYear()} ${storeName}. All rights reserved.
             </p>
           </td>
@@ -204,34 +204,34 @@ function generateOrderDeliveredEmail(customerName, orderId, storeName) {
     <tr><td align="center">
       <table cellpadding="0" cellspacing="0" style="${baseStyles.container}">
         <tr>
-          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #22c55e, #16a34a); color: #bbf7d0;">
-            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.9;">
+          <td style="${baseStyles.header}; background: radial-gradient(circle at 0% 0%, #f5f5f5, #111111); color: #f5f5f5;">
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.9; color: #f5f5f5;">
               ${storeName}
             </div>
-            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #f9fafb;">
+            <div style="margin-top: 6px; font-size: 22px; font-weight: 600; color: #ffffff;">
               Order delivered ✓
             </div>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.content}">
-            <p style="margin: 0 0 10px; font-size: 15px; color: #e5e7eb;">Hi ${customerName},</p>
-            <p style="margin: 0 0 14px; font-size: 14px; color: #9ca3af; line-height: 1.7;">
+            <p style="margin: 0 0 10px; font-size: 15px; color: #f5f5f5;">Hi ${customerName},</p>
+            <p style="margin: 0 0 14px; font-size: 14px; color: #cccccc; line-height: 1.7;">
               Your order <strong>#${orderId}</strong> has been delivered successfully.
             </p>
 
-            <p style="margin: 0 0 18px; font-size: 14px; color: #e5e7eb;">
+            <p style="margin: 0 0 18px; font-size: 14px; color: #f5f5f5;">
               We hope everything arrived in perfect condition. Your feedback helps us improve your experience.
             </p>
 
-            <p style="margin: 0; font-size: 12px; color: #6b7280;">
+            <p style="margin: 0; font-size: 12px; color: #999999;">
               Thank you for shopping with ${storeName}.
             </p>
           </td>
         </tr>
         <tr>
           <td style="${baseStyles.footer}">
-            <p style="margin: 0; font-size: 11px; color: #6b7280;">
+            <p style="margin: 0; font-size: 11px; color: #777777;">
               © ${new Date().getFullYear()} ${storeName}. All rights reserved.
             </p>
           </td>

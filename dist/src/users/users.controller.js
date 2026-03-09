@@ -83,6 +83,24 @@ let UsersController = class UsersController {
             data: result,
         };
     }
+    async initialSetPassword(body, companyIdFromQuery) {
+        const companyId = body.companyId || companyIdFromQuery;
+        if (!companyId) {
+            throw new common_1.BadRequestException('CompanyId is required');
+        }
+        const result = await this.usersService.initialSetPassword({
+            email: body.email,
+            companyId,
+            password: body.password,
+            confirmPassword: body.confirmPassword,
+            orderId: body.orderId,
+        });
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: result.message,
+            data: result,
+        };
+    }
     async create(body, companyIdFromQuery) {
         const companyId = body.companyId || companyIdFromQuery;
         const { companyId: _ignored, ...createUserDto } = body;
@@ -192,6 +210,16 @@ __decorate([
     __metadata("design:paramtypes", [Number, String, Object, String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.Post)('initial-set-password'),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('companyId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "initialSetPassword", null);
 __decorate([
     (0, common_1.Post)(),
     (0, public_decorator_1.Public)(),

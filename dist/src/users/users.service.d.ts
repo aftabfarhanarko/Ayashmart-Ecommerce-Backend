@@ -48,4 +48,14 @@ export declare class UsersService {
         success: boolean;
         message: string;
     }>;
+    initialSetPassword(params: {
+        email: string;
+        companyId: string;
+        password: string;
+        confirmPassword: string;
+        orderId?: number;
+    }): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

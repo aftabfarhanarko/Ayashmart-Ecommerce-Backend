@@ -312,6 +312,24 @@ let ProductController = class ProductController {
         const product = await this.productService.update(id, updateDto, companyId, performedByUserId);
         return { statusCode: common_1.HttpStatus.OK, message: "Product updated", data: product };
     }
+    async setFlashSell(flashSellDto, companyId) {
+        const startTime = new Date(flashSellDto.flashSellStartTime);
+        const endTime = new Date(flashSellDto.flashSellEndTime);
+        const products = await this.productService.setFlashSell(flashSellDto.productIds, startTime, endTime, flashSellDto.flashSellPrice, companyId);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: "Flash sell set for selected products",
+            data: products,
+        };
+    }
+    async removeFlashSell(body, companyId) {
+        const products = await this.productService.removeFlashSell(body.productIds, companyId);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: "Flash sell removed from selected products",
+            data: products,
+        };
+    }
     async softDelete(id, companyId, req) {
         const performedByUserId = req?.user?.role && ['SUPER_ADMIN', 'SYSTEM_OWNER', 'EMPLOYEE'].includes(req.user.role)
             ? +(req.user.userId || req.user.sub) : undefined;
@@ -336,24 +354,6 @@ let ProductController = class ProductController {
         const isActive = active === "true";
         const product = await this.productService.toggleActive(id, isActive, companyId);
         return { statusCode: common_1.HttpStatus.OK, message: `Product ${isActive ? "activated" : "disabled"}`, data: product };
-    }
-    async setFlashSell(flashSellDto, companyId) {
-        const startTime = new Date(flashSellDto.flashSellStartTime);
-        const endTime = new Date(flashSellDto.flashSellEndTime);
-        const products = await this.productService.setFlashSell(flashSellDto.productIds, startTime, endTime, flashSellDto.flashSellPrice, companyId);
-        return {
-            statusCode: common_1.HttpStatus.OK,
-            message: "Flash sell set for selected products",
-            data: products,
-        };
-    }
-    async removeFlashSell(body, companyId) {
-        const products = await this.productService.removeFlashSell(body.productIds, companyId);
-        return {
-            statusCode: common_1.HttpStatus.OK,
-            message: "Flash sell removed from selected products",
-            data: products,
-        };
     }
     async getActiveFlashSellProducts(companyIdFromQuery, companyIdFromToken) {
         const companyId = companyIdFromQuery || companyIdFromToken;
@@ -524,6 +524,22 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "update", null);
 __decorate([
+    (0, common_1.Post)("flash-sell"),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, company_id_decorator_1.CompanyId)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [flash_sell_dto_1.FlashSellDto, String]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "setFlashSell", null);
+__decorate([
+    (0, common_1.Delete)("flash-sell"),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, company_id_decorator_1.CompanyId)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "removeFlashSell", null);
+__decorate([
     (0, common_1.Delete)(":id"),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, company_id_decorator_1.CompanyId)()),
@@ -566,22 +582,6 @@ __decorate([
     __metadata("design:paramtypes", [Number, String, String]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "toggleActive", null);
-__decorate([
-    (0, common_1.Post)("flash-sell"),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, company_id_decorator_1.CompanyId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [flash_sell_dto_1.FlashSellDto, String]),
-    __metadata("design:returntype", Promise)
-], ProductController.prototype, "setFlashSell", null);
-__decorate([
-    (0, common_1.Delete)("flash-sell"),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, company_id_decorator_1.CompanyId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
-    __metadata("design:returntype", Promise)
-], ProductController.prototype, "removeFlashSell", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)("flash-sell/active"),

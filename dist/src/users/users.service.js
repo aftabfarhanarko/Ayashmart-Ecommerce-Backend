@@ -20,6 +20,7 @@ const user_entity_1 = require("./entities/user.entity");
 const jwt_1 = require("@nestjs/jwt");
 const crypto = require("crypto");
 const notifications_service_1 = require("../notifications/notifications.service");
+const order_entity_1 = require("../orders/entities/order.entity");
 let UsersService = class UsersService {
     get repository() {
         return this.userRepo || this.dataSource.getRepository(user_entity_1.User);
@@ -265,7 +266,7 @@ let UsersService = class UsersService {
             const html = `
         <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f9fafb; padding: 24px;">
           <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px 24px 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.12);">
-            <div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #6366f1; font-weight: 600; margin-bottom: 6px;">
+            <div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; font-weight: 600; margin-bottom: 6px;">
               Password reset
             </div>
             <h1 style="margin: 0 0 12px; font-size: 20px; line-height: 1.3; color: #0f172a;">
@@ -279,7 +280,7 @@ let UsersService = class UsersService {
               This link will expire in 1 hour.
             </p>
             <div style="margin: 18px 0 20px; text-align: center;">
-              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; border-radius: 999px; background: linear-gradient(90deg,#4f46e5,#6366f1); color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none;">
+              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; border-radius: 999px; background: linear-gradient(90deg,#ffffff,#111111); color: #000000; font-size: 14px; font-weight: 600; text-decoration: none;">
                 Reset your password
               </a>
             </div>
@@ -336,6 +337,44 @@ let UsersService = class UsersService {
             success: true,
             message: 'Password has been reset successfully. You can now login with your new password.',
         };
+    }
+    async initialSetPassword(params) {
+        const { email, companyId, password, confirmPassword, orderId } = params;
+        if (!companyId) {
+            throw new common_1.BadRequestException('CompanyId is required');
+        }
+        if (!email?.trim()) {
+            throw new common_1.BadRequestException('Email is required');
+        }
+        if (password !== confirmPassword) {
+            throw new common_1.BadRequestException('Passwords do not match');
+        }
+        const user = await this.repository.findOne({ where: { email, companyId } });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        if (user.passwordHash && user.passwordSalt) {
+            throw new common_1.BadRequestException('Password already set for this account');
+        }
+        if (typeof orderId === 'number' && !Number.isNaN(orderId)) {
+            const orderRepo = this.dataSource.getRepository(order_entity_1.Order);
+            const order = await orderRepo.findOne({
+                where: [
+                    { id: orderId, companyId, customer: { id: user.id } },
+                    { id: orderId, companyId, customerEmail: email },
+                ],
+                relations: ['customer'],
+            });
+            if (!order) {
+                throw new common_1.BadRequestException('Order validation failed for this account');
+            }
+        }
+        const salt = crypto.randomBytes(16).toString('hex');
+        const hash = this.hashPassword(password, salt);
+        user.passwordSalt = salt;
+        user.passwordHash = hash;
+        await this.repository.save(user);
+        return { success: true, message: 'Password has been set successfully.' };
     }
 };
 exports.UsersService = UsersService;

@@ -63,12 +63,12 @@ let SuperadminService = class SuperadminService {
   <title>Your Super Admin Account</title>
 </head>
 <body style="margin:0;padding:0;background-color:#020617;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;background:radial-gradient(circle at top,#4f46e5,#020617 55%);">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;background:radial-gradient(circle at top,#f5f5f5,#000000 55%);">
     <tr>
       <td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background-color:#020617;border-radius:18px;overflow:hidden;border:1px solid rgba(148,163,184,0.6);">
           <tr>
-            <td style="background:radial-gradient(circle at 0% 0%,#4f46e5,#7c3aed);padding:22px 26px 18px;text-align:left;">
+            <td style="background:radial-gradient(circle at 0% 0%,#f5f5f5,#111111);padding:22px 26px 18px;text-align:left;color:#f5f5f5;">
               <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#e0e7ff;opacity:0.9;">
                 Innowavecart · Super Admin
               </div>
@@ -115,7 +115,7 @@ let SuperadminService = class SuperadminService {
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px;">
                 <tr>
                   <td align="center">
-                    <a href="${loginUrl}" style="display:inline-block;padding:11px 22px;border-radius:999px;background:linear-gradient(to right,#4f46e5,#7c3aed);color:#eef2ff;font-size:14px;font-weight:500;text-decoration:none;box-shadow:0 12px 30px rgba(79,70,229,0.45);">
+                    <a href="${loginUrl}" style="display:inline-block;padding:11px 22px;border-radius:999px;background:linear-gradient(to right,#ffffff,#111111);color:#000000;font-size:14px;font-weight:500;text-decoration:none;box-shadow:0 12px 30px rgba(0,0,0,0.45);">
                       Go to Super Admin Login
                     </a>
                   </td>
@@ -129,7 +129,7 @@ let SuperadminService = class SuperadminService {
                       Security tip
                     </p>
                     <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
-                      For your security, please sign in and <span style="color:#f97316;font-weight:500;">change this temporary password</span> immediately from your profile settings.
+                      For your security, please sign in and <span style="color:#000000;font-weight:500;">change this temporary password</span> immediately from your profile settings.
                     </p>
                   </td>
                 </tr>

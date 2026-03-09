@@ -12,8 +12,8 @@ class EmailTemplates {
         const companyName = (user && user.companyName) || '';
         const packageInfo = user.package
             ? `
-            <h3 style="font-size: 15px; margin: 0 0 10px; color: #111827;">Your Package</h3>
-            <ul style="padding-left: 18px; margin: 0; font-size: 13px; color: #4b5563;">
+            <h3 style="font-size: 15px; margin: 0 0 10px; color: #111111;">Your Package</h3>
+            <ul style="padding-left: 18px; margin: 0; font-size: 13px; color: #444444;">
               <li><strong>Package Name:</strong> ${user.package.name}</li>
               <li><strong>Description:</strong> ${user.package.description}</li>
               <li><strong>Price:</strong> $${user.package.price}</li>
@@ -34,19 +34,19 @@ class EmailTemplates {
             : '';
         const passwordSection = newPassword
             ? `
-              <div style="margin-top: 18px; padding: 16px 18px; border-radius: 12px; border: 1px solid #bbf7d0; background-color: #f0fdf4;">
-                <h3 style="margin: 0 0 8px; font-size: 15px; color: #166534;">Your updated login credentials</h3>
-                <p style="margin: 4px 0; font-size: 13px; color: #1f2937;">
+              <div style="margin-top: 18px; padding: 16px 18px; border-radius: 12px; border: 1px solid #444444; background-color: #f9f9f9;">
+                <h3 style="margin: 0 0 8px; font-size: 15px; color: #111111;">Your updated login credentials</h3>
+                <p style="margin: 4px 0; font-size: 13px; color: #222222;">
                   <strong>Email:</strong>
                   <span style="font-family: system-ui, -apple-system, BlinkMacSystemFont;">${user.email}</span>
                 </p>
-                <p style="margin: 4px 0 10px; font-size: 13px; color: #1f2937;">
+                <p style="margin: 4px 0 10px; font-size: 13px; color: #222222;">
                   <strong>New password:</strong>
-                  <span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background-color: #ecfdf3; padding: 4px 10px; border-radius: 999px; font-size: 13px; display: inline-block;">
+                  <span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background-color: #eeeeee; padding: 4px 10px; border-radius: 999px; font-size: 13px; display: inline-block;">
                     ${newPassword}
                   </span>
                 </p>
-                <p style="margin: 0; font-size: 12px; color: #6b7280;">
+                <p style="margin: 0; font-size: 12px; color: #666666;">
                   For security, please update this password from your account settings after login.
                 </p>
               </div>
@@ -60,69 +60,69 @@ class EmailTemplates {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Password updated - ${companyName}</title>
   </head>
-  <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #e5e7eb; padding: 24px 0;">
+  <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111111;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5; padding: 24px 0;">
       <tr>
         <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);">
             <tr>
-              <td style="padding: 20px 28px; background: radial-gradient(circle at 0% 0%, #22d3ee, #2563eb); color: #e5e7eb;">
+              <td style="padding: 20px 28px; background: radial-gradient(circle at 0% 0%, #ffffff, #111111); color: #f5f5f5;">
                 <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.9;">
                   ${companyName}
                 </div>
-                <div style="margin-top: 6px; font-size: 18px; font-weight: 600; color: #f9fafb;">
+                <div style="margin-top: 6px; font-size: 18px; font-weight: 600; color: #ffffff;">
                   Password updated successfully
                 </div>
               </td>
             </tr>
             <tr>
-              <td style="padding: 26px 28px 28px; color: #111827;">
-                <p style="margin: 0 0 10px; font-size: 15px; color: #111827;">
+              <td style="padding: 26px 28px 28px; color: #111111;">
+                <p style="margin: 0 0 10px; font-size: 15px; color: #111111;">
                   Hi ${user.name || 'there'},
                 </p>
-                <p style="margin: 0 0 16px; font-size: 14px; color: #4b5563; line-height: 1.7;">
+                <p style="margin: 0 0 16px; font-size: 14px; color: #444444; line-height: 1.7;">
                   Your account password for <strong>${companyName}</strong> has been updated.
                   Below are your current account details.
                 </p>
 
                 ${passwordSection}
 
-                <div style="margin-top: 20px; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb; background-color: #f9fafb;">
-                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #111827;">Account information</h3>
-                  <p style="margin: 3px 0; font-size: 13px; color: #374151;"><strong>Email:</strong> ${user.email}</p>
-                  <p style="margin: 3px 0; font-size: 13px; color: #374151;"><strong>Company ID:</strong> ${user.companyId}</p>
-                  <p style="margin: 3px 0; font-size: 13px; color: #374151;"><strong>Company name:</strong> ${companyName}</p>
+                <div style="margin-top: 20px; padding: 16px 18px; border-radius: 12px; border: 1px solid #dddddd; background-color: #f9f9f9;">
+                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #111111;">Account information</h3>
+                  <p style="margin: 3px 0; font-size: 13px; color: #222222;"><strong>Email:</strong> ${user.email}</p>
+                  <p style="margin: 3px 0; font-size: 13px; color: #222222;"><strong>Company ID:</strong> ${user.companyId}</p>
+                  <p style="margin: 3px 0; font-size: 13px; color: #222222;"><strong>Company name:</strong> ${companyName}</p>
                   ${user.phone
-            ? `<p style="margin: 3px 0; font-size: 13px; color: #374151;"><strong>Phone:</strong> ${user.phone}</p>`
+            ? `<p style="margin: 3px 0; font-size: 13px; color: #222222;"><strong>Phone:</strong> ${user.phone}</p>`
             : ''}
                   ${user.branchLocation
-            ? `<p style="margin: 3px 0; font-size: 13px; color: #374151;"><strong>Branch location:</strong> ${user.branchLocation}</p>`
+            ? `<p style="margin: 3px 0; font-size: 13px; color: #222222;"><strong>Branch location:</strong> ${user.branchLocation}</p>`
             : ''}
                 </div>
 
                 ${user.package
             ? `
-                <div style="margin-top: 18px; padding: 15px 16px; border-radius: 12px; border: 1px solid #e5e7eb; background-color: #ffffff;">
+                <div style="margin-top: 18px; padding: 15px 16px; border-radius: 12px; border: 1px solid #dddddd; background-color: #ffffff;">
                   ${packageInfo}
                 </div>
                 `
             : ''}
 
-                <div style="margin-top: 18px; padding: 14px 16px; border-radius: 12px; border: 1px solid #fbbf24; background-color: #fffbeb;">
-                  <p style="margin: 0; font-size: 12px; color: #92400e;">
+                <div style="margin-top: 18px; padding: 14px 16px; border-radius: 12px; border: 1px solid #dddddd; background-color: #f9f9f9;">
+                  <p style="margin: 0; font-size: 12px; color: #333333;">
                     If you did not request this change, please contact the ${companyName} support team immediately.
                   </p>
                 </div>
 
-                <p style="margin: 20px 0 0; font-size: 13px; color: #6b7280;">
+                <p style="margin: 20px 0 0; font-size: 13px; color: #666666;">
                   Best regards,<br />
                   <span style="font-weight: 500;">${companyName} Team</span>
                 </p>
               </td>
             </tr>
             <tr>
-              <td style="padding: 14px 28px 20px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; text-align: center;">
-                <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+              <td style="padding: 14px 28px 20px; background-color: #f9f9f9; border-top: 1px solid #dddddd; text-align: center;">
+                <p style="margin: 0; font-size: 11px; color: #777777;">
                   © ${new Date().getFullYear()} ${companyName}. All rights reserved.
                 </p>
               </td>
@@ -168,12 +168,12 @@ class EmailTemplates {
     <title>Welcome to ${companyName}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="padding: 28px 0; background: radial-gradient(circle at top, #1d4ed8, #020617 55%);">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="padding: 28px 0; background: radial-gradient(circle at top, #f5f5f5, #000000 55%);">
       <tr>
         <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #020617; border-radius: 18px; overflow: hidden; border: 1px solid rgba(148, 163, 184, 0.4);">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #000000; border-radius: 18px; overflow: hidden; border: 1px solid #444444;">
             <tr>
-              <td style="padding: 20px 26px 16px; background: radial-gradient(circle at 0% 0%, #22d3ee, #6366f1); color: #e5e7eb;">
+              <td style="padding: 20px 26px 16px; background: radial-gradient(circle at 0% 0%, #f5f5f5, #111111); color: #f5f5f5;">
                 <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.95;">
                   ${companyName}
                 </div>
@@ -279,12 +279,12 @@ class EmailTemplates {
     <title>Password reset request - ${companyName}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #020617; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="padding: 28px 0; background: radial-gradient(circle at top, #4f46e5, #020617 55%);">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="padding: 28px 0; background: radial-gradient(circle at top, #f5f5f5, #000000 55%);">
       <tr>
         <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #020617; border-radius: 18px; overflow: hidden; border: 1px solid rgba(148, 163, 184, 0.4);">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #000000; border-radius: 18px; overflow: hidden; border: 1px solid #444444;">
             <tr>
-              <td style="padding: 20px 24px 16px; background: radial-gradient(circle at 0% 0%, #22c55e, #16a34a); color: #ecfdf5;">
+              <td style="padding: 20px 24px 16px; background: radial-gradient(circle at 0% 0%, #f5f5f5, #111111); color: #f5f5f5;">
                 <div style="font-size: 14px; font-weight: 600;">
                   ${companyName} password reset
                 </div>
@@ -305,8 +305,8 @@ class EmailTemplates {
 
                 <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin: 10px auto 4px;">
                   <tr>
-                    <td align="center" style="border-radius: 999px; background: linear-gradient(135deg, #22c55e, #16a34a);">
-                      <a href="${resetLink}" style="display: inline-block; padding: 11px 32px; text-decoration: none; color: #ecfdf5; font-size: 14px; font-weight: 600;">
+                    <td align="center" style="border-radius: 999px; background: linear-gradient(135deg, #ffffff, #111111);">
+                      <a href="${resetLink}" style="display: inline-block; padding: 11px 32px; text-decoration: none; color: #000000; font-size: 14px; font-weight: 600;">
                         Reset password
                       </a>
                     </td>
@@ -320,8 +320,8 @@ class EmailTemplates {
                   ${resetLink}
                 </p>
 
-                <div style="margin-top: 18px; padding: 12px 14px; border-radius: 12px; border: 1px solid #f97316; background-color: rgba(248, 250, 252, 0.02);">
-                  <p style="margin: 0; font-size: 11px; color: #fed7aa;">
+                <div style="margin-top: 18px; padding: 12px 14px; border-radius: 12px; border: 1px solid #444444; background-color: rgba(0, 0, 0, 0.15);">
+                  <p style="margin: 0; font-size: 11px; color: #f5f5f5;">
                     If you did not request a password reset, you can safely ignore this email.
                   </p>
                 </div>
@@ -356,14 +356,14 @@ class EmailTemplates {
         <td align="center">
           <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16);">
             <tr>
-              <td style="padding: 22px 28px 18px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #ecfdf5;">
+              <td style="padding: 22px 28px 18px; background: linear-gradient(135deg, #ffffff, #111111); color: #f5f5f5;">
                 <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.9;">
                   ${companyName} · Store setup complete
                 </div>
                 <div style="margin-top: 6px; font-size: 20px; font-weight: 600;">
                   Your store is now ready
                 </div>
-                <p style="margin: 6px 0 0; font-size: 13px; color: #bbf7d0;">
+                <p style="margin: 6px 0 0; font-size: 13px; color: #f5f5f5;">
                   You can log in and start customizing your storefront immediately.
                 </p>
               </td>
@@ -377,30 +377,30 @@ class EmailTemplates {
                   Your payment has been confirmed and your store subdomain is ready. Use the details below to access your admin panel.
                 </p>
 
-                <div style="margin-top: 8px; padding: 16px 18px; border-radius: 12px; border: 1px solid #bbf7d0; background-color: #f0fdf4;">
-                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #166534;">Login details</h3>
-                  <p style="margin: 4px 0; font-size: 13px; color: #14532d;">
+                <div style="margin-top: 8px; padding: 16px 18px; border-radius: 12px; border: 1px solid #dddddd; background-color: #f9f9f9;">
+                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #111111;">Login details</h3>
+                  <p style="margin: 4px 0; font-size: 13px; color: #222222;">
                     <strong>Email:</strong>
                     <span style="font-family: system-ui, -apple-system, BlinkMacSystemFont;">${user.email}</span>
                   </p>
-                  <p style="margin: 4px 0; font-size: 13px; color: #14532d;">
+                  <p style="margin: 4px 0; font-size: 13px; color: #222222;">
                     <strong>Temporary password:</strong>
-                    <span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background-color: #ecfdf3; padding: 4px 10px; border-radius: 999px; font-size: 13px; display: inline-block;">
+                    <span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background-color: #eeeeee; padding: 4px 10px; border-radius: 999px; font-size: 13px; display: inline-block;">
                       ${password}
                     </span>
                   </p>
-                  <p style="margin: 8px 0 0; font-size: 12px; color: #166534;">
+                  <p style="margin: 8px 0 0; font-size: 12px; color: #444444;">
                     Please change this password from your profile settings after you log in.
                   </p>
                 </div>
 
-                <div style="margin-top: 16px; padding: 16px 18px; border-radius: 12px; border: 1px solid #bfdbfe; background-color: #eff6ff;">
-                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #1d4ed8;">Store URL</h3>
-                  <p style="margin: 4px 0 10px; font-size: 13px; color: #1f2937;">
+                <div style="margin-top: 16px; padding: 16px 18px; border-radius: 12px; border: 1px solid #dddddd; background-color: #f9f9f9;">
+                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #111111;">Store URL</h3>
+                  <p style="margin: 4px 0 10px; font-size: 13px; color: #222222;">
                     <strong>Subdomain:</strong>
                   </p>
                   <p style="margin: 0; font-size: 13px;">
-                    <a href="${subdomainUrl}" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">
+                    <a href="${subdomainUrl}" style="color: #000000; text-decoration: underline; font-weight: 500;">
                       ${subdomainUrl}
                     </a>
                   </p>
@@ -436,11 +436,11 @@ class EmailTemplates {
         <td align="center">
           <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16);">
             <tr>
-              <td style="padding: 20px 28px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #ecfdf5;">
+              <td style="padding: 20px 28px; background: linear-gradient(135deg, #ffffff, #111111); color: #f5f5f5;">
                 <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.9;">
                   ${companyName}
                 </div>
-                <div style="margin-top: 6px; font-size: 20px; font-weight: 600;">
+                <div style="margin-top: 6px; font-size: 20px; font-weight: 600; color: #ffffff;">
                   Package upgraded
                 </div>
               </td>
@@ -465,16 +465,16 @@ class EmailTemplates {
                 `
             : ''}
 
-                <div style="margin-top: 14px; padding: 14px 16px; border-radius: 12px; border: 1px solid #bbf7d0; background-color: #f0fdf4;">
-                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #166534;">New package</h3>
-                  <p style="margin: 3px 0; font-size: 13px; color: #166534;">
+                <div style="margin-top: 14px; padding: 14px 16px; border-radius: 12px; border: 1px solid #dddddd; background-color: #f9f9f9;">
+                  <h3 style="margin: 0 0 8px; font-size: 15px; color: #111111;">New package</h3>
+                  <p style="margin: 3px 0; font-size: 13px; color: #222222;">
                     <strong>${newPackage.name}</strong> – $${newPackage.price}
                   </p>
                   ${newPackage.discountPrice
-            ? `<p style="margin: 3px 0; font-size: 13px; color: #166534;"><strong>Discount Price:</strong> $${newPackage.discountPrice}</p>`
+            ? `<p style="margin: 3px 0; font-size: 13px; color: #222222;"><strong>Discount Price:</strong> $${newPackage.discountPrice}</p>`
             : ''}
                   ${newPackage.features && newPackage.features.length > 0
-            ? `<div style="margin-top: 6px; font-size: 13px; color: #166534;">
+            ? `<div style="margin-top: 6px; font-size: 13px; color: #222222;">
                           <strong>Features / Permissions:</strong>
                           <ul style="margin: 6px 0 0 16px; padding: 0;">
                             ${newPackage.features

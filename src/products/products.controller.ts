@@ -478,6 +478,34 @@ export class ProductController {
     return { statusCode: HttpStatus.OK, message: "Product updated", data: product };
   }
 
+  @Post("flash-sell")
+  async setFlashSell(@Body() flashSellDto: FlashSellDto, @CompanyId() companyId: string) {
+    const startTime = new Date(flashSellDto.flashSellStartTime);
+    const endTime = new Date(flashSellDto.flashSellEndTime);
+    const products = await this.productService.setFlashSell(
+      flashSellDto.productIds,
+      startTime,
+      endTime,
+      flashSellDto.flashSellPrice,
+      companyId
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: "Flash sell set for selected products",
+      data: products,
+    };
+  }
+
+  @Delete("flash-sell")
+  async removeFlashSell(@Body() body: { productIds: number[] }, @CompanyId() companyId: string) {
+    const products = await this.productService.removeFlashSell(body.productIds, companyId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: "Flash sell removed from selected products",
+      data: products,
+    };
+  }
+
   @Delete(":id")
   async softDelete(@Param("id", ParseIntPipe) id: number, @CompanyId() companyId: string, @Req() req?: any) {
     const performedByUserId = req?.user?.role && ['SUPER_ADMIN', 'SYSTEM_OWNER', 'EMPLOYEE'].includes(req.user.role)
@@ -511,34 +539,6 @@ export class ProductController {
     const isActive = active === "true";
     const product = await this.productService.toggleActive(id, isActive, companyId);
     return { statusCode: HttpStatus.OK, message: `Product ${isActive ? "activated" : "disabled"}`, data: product };
-  }
-
-  @Post("flash-sell")
-  async setFlashSell(@Body() flashSellDto: FlashSellDto, @CompanyId() companyId: string) {
-    const startTime = new Date(flashSellDto.flashSellStartTime);
-    const endTime = new Date(flashSellDto.flashSellEndTime);
-    const products = await this.productService.setFlashSell(
-      flashSellDto.productIds,
-      startTime,
-      endTime,
-      flashSellDto.flashSellPrice,
-      companyId
-    );
-    return {
-      statusCode: HttpStatus.OK,
-      message: "Flash sell set for selected products",
-      data: products,
-    };
-  }
-
-  @Delete("flash-sell")
-  async removeFlashSell(@Body() body: { productIds: number[] }, @CompanyId() companyId: string) {
-    const products = await this.productService.removeFlashSell(body.productIds, companyId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: "Flash sell removed from selected products",
-      data: products,
-    };
   }
 
   @Public()

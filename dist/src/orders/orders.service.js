@@ -105,6 +105,7 @@ let OrderService = class OrderService {
             order.customerPhone = customer?.phone ?? createDto.customerPhone ?? "";
             order.customerEmail = customer?.email ?? createDto.customerEmail ?? undefined;
             order.customerAddress = createDto.shippingAddress ?? customer?.address ?? createDto.customerAddress ?? "";
+            order.orderInfo = createDto.orderInfo ?? undefined;
             order.status = "pending";
             order.paymentMethod = createDto.paymentMethod ?? "DIRECT";
             order.deliveryType = createDto.deliveryType ?? "INSIDEDHAKA";
