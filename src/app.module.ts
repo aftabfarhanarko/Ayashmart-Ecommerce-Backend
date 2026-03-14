@@ -1,25 +1,20 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { SubdomainMiddleware } from './common/middleware/subdomain.middleware';
 import { SystemUser } from './systemuser/entities/systemuser.entity';
+import { createTransport } from 'nodemailer';
+import { CacheModule } from '@nestjs/cache-manager';
+
+// Modules
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
-import { Global } from '@nestjs/common';
-
 import { FraudcheckerModule } from './fraudchecker/fraudchecker.module';
-// removed: import { DeliveryaddressModule } from './deliveryaddress/deliveryaddress.module';
 import { CartproductsModule } from './cartproducts/cartproducts.module';
 import { BannerModule } from './banner/banner.module';
 import { PromocodeModule } from './promocode/promocode.module';
@@ -28,7 +23,6 @@ import { HelpModule } from './help/help.module';
 import { SystemuserModule } from './systemuser/systemuser.module';
 import { EarningsModule } from './earnings/earnings.module';
 import { OverviewModule } from './overview/overview.module';
-import { createTransport } from 'nodemailer';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PrivecyPolicyModule } from './privecy-policy/privecy-policy.module';
@@ -45,7 +39,6 @@ import { SaleInvoiceModule } from './sale-invoice/sale-invoice.module';
 import { CreditNoteModule } from './credit-note/credit-note.module';
 import { MediaModule } from './media/media.module';
 import { ResellerModule } from './reseller/reseller.module';
-import { CacheModule } from '@nestjs/cache-manager';
 import { TopProductsModule } from './top-products/top-products.module';
 
 @Global()
@@ -55,17 +48,17 @@ import { TopProductsModule } from './top-products/top-products.module';
       isGlobal: true,
     }),
 
-    // Use in-memory cache; Redis removed for local/dev
+    // ✅ Correct cache config
     CacheModule.register({
       isGlobal: true,
-      ttl: 300 * 1000,
+      ttl: 300, // seconds
     }),
 
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      synchronize: true, // true only in development!
-      logging: true, // true only in development!
+      synchronize: true,
+      logging: true,
       ssl: {
         rejectUnauthorized: false,
       },
@@ -77,27 +70,16 @@ import { TopProductsModule } from './top-products/top-products.module';
     ScheduleModule.forRoot(),
 
     CategoryModule,
-
     ProductModule,
-
     OrdersModule,
-
     UsersModule,
-
     PaymentsModule,
     FraudcheckerModule,
-
-    // removed DeliveryaddressModule,
     CartproductsModule,
-
     BannerModule,
-
     PromocodeModule,
-
     SettingModule,
-
     HelpModule,
-
     SystemuserModule,
     EarningsModule,
     OverviewModule,
@@ -118,16 +100,16 @@ import { TopProductsModule } from './top-products/top-products.module';
     MediaModule,
     ResellerModule,
     TopProductsModule,
-
   ],
+
   controllers: [AppController],
+
   providers: [
     AppService,
     {
       provide: 'MAILER_TRANSPORT',
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-
+      useFactory: () => {
         return createTransport({
           host: 'smtp.gmail.com',
           port: 587,
@@ -143,16 +125,10 @@ import { TopProductsModule } from './top-products/top-products.module';
           greetingTimeout: 30000,
           socketTimeout: 30000,
         });
-        
       },
     },
   ],
+
   exports: ['MAILER_TRANSPORT'],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(SubdomainMiddleware)
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
-  }
-}
+export class AppModule {}
