@@ -4,6 +4,7 @@ import { UpdateSettingDto } from './dto/update-setting.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Setting } from './entities/setting.entity';
+import { UpdateSmtpDto } from './dto/update-smtp.dto';
 
 @Injectable()
 export class SettingService {
@@ -20,6 +21,15 @@ export class SettingService {
     return this.settingRepo.find();
   }
 
+  async findFirstByCompanyId(companyId: string) {
+    const entity = await this.settingRepo.findOne({
+      where: { companyId },
+      order: { id: 'ASC' },
+    });
+    if (!entity) throw new NotFoundException('No settings found');
+    return entity;
+  }
+
   async findFirst() {
     const entity = await this.settingRepo.findOne({
       where: {},
@@ -27,6 +37,36 @@ export class SettingService {
     });
     if (!entity) throw new NotFoundException('No settings found');
     return entity;
+  }
+
+  async upsertSmtp(companyId: string, dto: UpdateSmtpDto) {
+    let entity: Setting | null = null;
+    try {
+      entity = await this.settingRepo.findOne({
+        where: { companyId },
+        order: { id: 'ASC' },
+      });
+    } catch {
+      entity = null;
+    }
+
+    if (!entity) {
+      const smtpUser = dto.smtpUser?.trim() || '';
+      const created = this.settingRepo.create({
+        companyId,
+        companyName: 'Default',
+        email: smtpUser || 'noreply@example.com',
+        smtpUser: smtpUser || null,
+        smtpPass: dto.smtpPass ?? null,
+      } as Partial<Setting>);
+      return this.settingRepo.save(created);
+    }
+
+    const merged = this.settingRepo.merge(entity, {
+      smtpUser: dto.smtpUser?.trim() || null,
+      smtpPass: dto.smtpPass ?? null,
+    });
+    return this.settingRepo.save(merged);
   }
 
   async findOne(id: number) {

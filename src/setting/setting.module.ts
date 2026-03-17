@@ -3,11 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingService } from './setting.service';
 import { SettingController } from './setting.controller';
 import { Setting } from './entities/setting.entity';
+import { RequestContextService } from '../common/services/request-context.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Setting])],
   controllers: [SettingController],
-  providers: [SettingService],
+  providers: [SettingService, RequestContextService],
   exports: [SettingService],
 })
 export class SettingModule {}
