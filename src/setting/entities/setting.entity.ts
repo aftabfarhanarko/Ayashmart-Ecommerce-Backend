@@ -23,6 +23,26 @@ export class Setting {
   @Column({ nullable: false })
   companyId: string;
 
+  // SMTP settings (editable from frontend)
+  @Column({ nullable: true })
+  smtpHost?: string;
+
+  @Column({ type: 'int', nullable: true })
+  smtpPort?: number;
+
+  @Column({ type: 'boolean', nullable: true })
+  smtpSecure?: boolean;
+
+  @Column({ nullable: true })
+  smtpUser?: string;
+
+  // Note: storing passwords in DB has risk; consider encrypting at rest.
+  @Column({ nullable: true })
+  smtpPass?: string;
+
+  @Column({ nullable: true })
+  smtpFrom?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -7,6 +7,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SystemUser } from './systemuser/entities/systemuser.entity';
 import { createTransport } from 'nodemailer';
 import { CacheModule } from '@nestjs/cache-manager';
+import { SettingService } from './setting/setting.service';
 
 // Modules
 import { CategoryModule } from './category/category.module';
@@ -108,23 +109,80 @@ import { TopProductsModule } from './top-products/top-products.module';
     AppService,
     {
       provide: 'MAILER_TRANSPORT',
-      inject: [ConfigService],
-      useFactory: () => {
-        return createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false,
-          auth: {
-            user: 'humairakhonom@gmail.com',
-            pass: 'uxwm cwcx afmw qbso',
+      inject: [ConfigService, SettingService],
+      useFactory: (config: ConfigService, settingService: SettingService) => {
+        let cached:
+          | { key: string; transport: ReturnType<typeof createTransport> }
+          | undefined;
+
+        const buildKey = (s: {
+          smtpUser: string;
+          smtpPass: string;
+        }) => [s.smtpUser, s.smtpPass].join('|');
+
+        const buildTransport = (s: {
+          smtpUser: string;
+          smtpPass: string;
+        }) =>
+          createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: { user: s.smtpUser, pass: s.smtpPass },
+            tls: {
+              rejectUnauthorized: false,
+            },
+            connectionTimeout: 30000,
+            greetingTimeout: 30000,
+            socketTimeout: 30000,
+          });
+
+        return {
+          async sendMail(options: any) {
+            // Priority: DB settings (set from frontend) -> env fallback
+            let setting:
+              | {
+                  smtpUser?: string;
+                  smtpPass?: string;
+                }
+              | undefined;
+
+            try {
+              setting = await settingService.findFirst();
+            } catch {
+              // No settings row yet; fallback to env
+            }
+
+            const smtpUser = setting?.smtpUser ?? config.get<string>('SMTP_USER');
+            const smtpPass = setting?.smtpPass ?? config.get<string>('SMTP_PASS');
+
+            if (!smtpUser || !smtpPass) {
+              throw new Error(
+                'SMTP is not configured. Set SMTP in Settings (frontend) or provide SMTP_USER/SMTP_PASS env vars.',
+              );
+            }
+
+            const key = buildKey({
+              smtpUser,
+              smtpPass,
+            });
+
+            if (!cached || cached.key !== key) {
+              cached = {
+                key,
+                transport: buildTransport({
+                  smtpUser,
+                  smtpPass,
+                }),
+              };
+            }
+
+            const from =
+              options?.from ?? smtpUser;
+
+            return cached.transport.sendMail({ ...options, from });
           },
-          tls: {
-            rejectUnauthorized: false,
-          },
-          connectionTimeout: 30000,
-          greetingTimeout: 30000,
-          socketTimeout: 30000,
-        });
+        };
       },
     },
   ],

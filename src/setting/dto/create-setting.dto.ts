@@ -23,4 +23,15 @@ export class CreateSettingDto {
   @IsString()
   @MaxLength(255)
   location?: string;
+
+  // SMTP settings (editable from frontend)
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  smtpUser?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  smtpPass?: string;
 }

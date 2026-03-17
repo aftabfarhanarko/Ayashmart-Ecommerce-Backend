@@ -20,6 +20,15 @@ export class SettingService {
     return this.settingRepo.find();
   }
 
+  async findFirst() {
+    const entity = await this.settingRepo.findOne({
+      where: {},
+      order: { id: 'ASC' },
+    });
+    if (!entity) throw new NotFoundException('No settings found');
+    return entity;
+  }
+
   async findOne(id: number) {
     const entity = await this.settingRepo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Setting ${id} not found`);
