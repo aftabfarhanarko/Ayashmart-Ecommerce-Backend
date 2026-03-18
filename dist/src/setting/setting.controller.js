@@ -19,9 +19,12 @@ const create_setting_dto_1 = require("./dto/create-setting.dto");
 const update_setting_dto_1 = require("./dto/update-setting.dto");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const company_id_guard_1 = require("../common/guards/company-id.guard");
+const request_context_service_1 = require("../common/services/request-context.service");
+const update_smtp_dto_1 = require("./dto/update-smtp.dto");
 let SettingController = class SettingController {
-    constructor(settingService) {
+    constructor(settingService, requestContext) {
         this.settingService = settingService;
+        this.requestContext = requestContext;
     }
     async create(createSettingDto) {
         const data = await this.settingService.create(createSettingDto);
@@ -30,6 +33,11 @@ let SettingController = class SettingController {
     async findAll() {
         const data = await this.settingService.findAll();
         return { status: 'success', message: 'Settings fetched successfully', data };
+    }
+    async upsertSmtp(dto) {
+        const companyId = this.requestContext.getCompanyId();
+        const data = await this.settingService.upsertSmtp(companyId, dto);
+        return { status: 'success', message: 'SMTP updated successfully', data };
     }
     async findOne(id) {
         const data = await this.settingService.findOne(+id);
@@ -59,6 +67,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SettingController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Patch)('smtp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [update_smtp_dto_1.UpdateSmtpDto]),
+    __metadata("design:returntype", Promise)
+], SettingController.prototype, "upsertSmtp", null);
+__decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -83,6 +98,7 @@ __decorate([
 exports.SettingController = SettingController = __decorate([
     (0, common_1.Controller)('setting'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, company_id_guard_1.CompanyIdGuard),
-    __metadata("design:paramtypes", [setting_service_1.SettingService])
+    __metadata("design:paramtypes", [setting_service_1.SettingService,
+        request_context_service_1.RequestContextService])
 ], SettingController);
 //# sourceMappingURL=setting.controller.js.map

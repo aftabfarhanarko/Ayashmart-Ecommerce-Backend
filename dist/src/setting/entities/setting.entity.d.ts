@@ -6,6 +6,12 @@ export declare class Setting {
     phone?: string;
     location?: string;
     companyId: string;
+    smtpHost?: string;
+    smtpPort?: number;
+    smtpSecure?: boolean;
+    smtpUser?: string;
+    smtpPass?: string;
+    smtpFrom?: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;

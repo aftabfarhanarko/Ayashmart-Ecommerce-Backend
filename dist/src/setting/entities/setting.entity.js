@@ -43,6 +43,30 @@ __decorate([
     __metadata("design:type", String)
 ], Setting.prototype, "companyId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Setting.prototype, "smtpHost", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
+    __metadata("design:type", Number)
+], Setting.prototype, "smtpPort", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', nullable: true }),
+    __metadata("design:type", Boolean)
+], Setting.prototype, "smtpSecure", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Setting.prototype, "smtpUser", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Setting.prototype, "smtpPass", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Setting.prototype, "smtpFrom", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Setting.prototype, "createdAt", void 0);

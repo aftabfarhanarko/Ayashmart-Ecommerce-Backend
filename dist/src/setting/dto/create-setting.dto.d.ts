@@ -4,4 +4,6 @@ export declare class CreateSettingDto {
     email: string;
     phone?: string;
     location?: string;
+    smtpUser?: string;
+    smtpPass?: string;
 }

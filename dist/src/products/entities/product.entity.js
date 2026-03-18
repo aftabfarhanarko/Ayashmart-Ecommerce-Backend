@@ -128,6 +128,10 @@ __decorate([
     __metadata("design:type", Number)
 ], ProductEntity.prototype, "resellerId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'simple-json', nullable: true }),
+    __metadata("design:type", Array)
+], ProductEntity.prototype, "variantId", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => category_entity_1.CategoryEntity, { nullable: false }),
     __metadata("design:type", category_entity_1.CategoryEntity)
 ], ProductEntity.prototype, "category", void 0);

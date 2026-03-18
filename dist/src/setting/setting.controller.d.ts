@@ -1,9 +1,12 @@
 import { SettingService } from './setting.service';
 import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
+import { RequestContextService } from '../common/services/request-context.service';
+import { UpdateSmtpDto } from './dto/update-smtp.dto';
 export declare class SettingController {
     private readonly settingService;
-    constructor(settingService: SettingService);
+    private readonly requestContext;
+    constructor(settingService: SettingService, requestContext: RequestContextService);
     create(createSettingDto: CreateSettingDto): Promise<{
         status: string;
         message: string;
@@ -13,6 +16,11 @@ export declare class SettingController {
         status: string;
         message: string;
         data: import("./entities/setting.entity").Setting[];
+    }>;
+    upsertSmtp(dto: UpdateSmtpDto): Promise<{
+        status: string;
+        message: string;
+        data: import("./entities/setting.entity").Setting;
     }>;
     findOne(id: string): Promise<{
         status: string;

@@ -28,6 +28,52 @@ let SettingService = class SettingService {
     async findAll() {
         return this.settingRepo.find();
     }
+    async findFirstByCompanyId(companyId) {
+        const entity = await this.settingRepo.findOne({
+            where: { companyId },
+            order: { id: 'ASC' },
+        });
+        if (!entity)
+            throw new common_1.NotFoundException('No settings found');
+        return entity;
+    }
+    async findFirst() {
+        const entity = await this.settingRepo.findOne({
+            where: {},
+            order: { id: 'ASC' },
+        });
+        if (!entity)
+            throw new common_1.NotFoundException('No settings found');
+        return entity;
+    }
+    async upsertSmtp(companyId, dto) {
+        let entity = null;
+        try {
+            entity = await this.settingRepo.findOne({
+                where: { companyId },
+                order: { id: 'ASC' },
+            });
+        }
+        catch {
+            entity = null;
+        }
+        if (!entity) {
+            const smtpUser = dto.smtpUser?.trim() || '';
+            const created = this.settingRepo.create({
+                companyId,
+                companyName: 'Default',
+                email: smtpUser || 'noreply@example.com',
+                smtpUser: smtpUser || null,
+                smtpPass: dto.smtpPass ?? null,
+            });
+            return this.settingRepo.save(created);
+        }
+        const merged = this.settingRepo.merge(entity, {
+            smtpUser: dto.smtpUser?.trim() || null,
+            smtpPass: dto.smtpPass ?? null,
+        });
+        return this.settingRepo.save(merged);
+    }
     async findOne(id) {
         const entity = await this.settingRepo.findOne({ where: { id } });
         if (!entity)

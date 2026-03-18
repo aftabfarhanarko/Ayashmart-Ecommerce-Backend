@@ -13,14 +13,15 @@ const app_service_1 = require("./app.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
 const schedule_1 = require("@nestjs/schedule");
-const subdomain_middleware_1 = require("./common/middleware/subdomain.middleware");
 const systemuser_entity_1 = require("./systemuser/entities/systemuser.entity");
+const nodemailer_1 = require("nodemailer");
+const cache_manager_1 = require("@nestjs/cache-manager");
+const setting_service_1 = require("./setting/setting.service");
 const category_module_1 = require("./category/category.module");
 const products_module_1 = require("./products/products.module");
 const orders_module_1 = require("./orders/orders.module");
 const users_module_1 = require("./users/users.module");
 const payments_module_1 = require("./payments/payments.module");
-const common_2 = require("@nestjs/common");
 const fraudchecker_module_1 = require("./fraudchecker/fraudchecker.module");
 const cartproducts_module_1 = require("./cartproducts/cartproducts.module");
 const banner_module_1 = require("./banner/banner.module");
@@ -30,7 +31,6 @@ const help_module_1 = require("./help/help.module");
 const systemuser_module_1 = require("./systemuser/systemuser.module");
 const earnings_module_1 = require("./earnings/earnings.module");
 const overview_module_1 = require("./overview/overview.module");
-const nodemailer_1 = require("nodemailer");
 const notifications_module_1 = require("./notifications/notifications.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
 const privecy_policy_module_1 = require("./privecy-policy/privecy-policy.module");
@@ -47,18 +47,12 @@ const sale_invoice_module_1 = require("./sale-invoice/sale-invoice.module");
 const credit_note_module_1 = require("./credit-note/credit-note.module");
 const media_module_1 = require("./media/media.module");
 const reseller_module_1 = require("./reseller/reseller.module");
-const cache_manager_1 = require("@nestjs/cache-manager");
 const top_products_module_1 = require("./top-products/top-products.module");
 let AppModule = class AppModule {
-    configure(consumer) {
-        consumer
-            .apply(subdomain_middleware_1.SubdomainMiddleware)
-            .forRoutes({ path: '*', method: common_1.RequestMethod.ALL });
-    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
-    (0, common_2.Global)(),
+    (0, common_1.Global)(),
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({
@@ -66,7 +60,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             cache_manager_1.CacheModule.register({
                 isGlobal: true,
-                ttl: 300 * 1000,
+                ttl: 300,
             }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
@@ -117,16 +111,15 @@ exports.AppModule = AppModule = __decorate([
             app_service_1.AppService,
             {
                 provide: 'MAILER_TRANSPORT',
-                inject: [config_1.ConfigService],
-                useFactory: (configService) => {
-                    return (0, nodemailer_1.createTransport)({
+                inject: [config_1.ConfigService, setting_service_1.SettingService],
+                useFactory: (config, settingService) => {
+                    let cached;
+                    const buildKey = (s) => [s.smtpUser, s.smtpPass].join('|');
+                    const buildTransport = (s) => (0, nodemailer_1.createTransport)({
                         host: 'smtp.gmail.com',
                         port: 587,
                         secure: false,
-                        auth: {
-                            user: 'humairakhonom@gmail.com',
-                            pass: 'uxwm cwcx afmw qbso',
-                        },
+                        auth: { user: s.smtpUser, pass: s.smtpPass },
                         tls: {
                             rejectUnauthorized: false,
                         },
@@ -134,6 +127,36 @@ exports.AppModule = AppModule = __decorate([
                         greetingTimeout: 30000,
                         socketTimeout: 30000,
                     });
+                    return {
+                        async sendMail(options) {
+                            let setting;
+                            try {
+                                setting = await settingService.findFirst();
+                            }
+                            catch {
+                            }
+                            const smtpUser = setting?.smtpUser ?? config.get('SMTP_USER');
+                            const smtpPass = setting?.smtpPass ?? config.get('SMTP_PASS');
+                            if (!smtpUser || !smtpPass) {
+                                throw new Error('SMTP is not configured. Set SMTP in Settings (frontend) or provide SMTP_USER/SMTP_PASS env vars.');
+                            }
+                            const key = buildKey({
+                                smtpUser,
+                                smtpPass,
+                            });
+                            if (!cached || cached.key !== key) {
+                                cached = {
+                                    key,
+                                    transport: buildTransport({
+                                        smtpUser,
+                                        smtpPass,
+                                    }),
+                                };
+                            }
+                            const from = options?.from ?? smtpUser;
+                            return cached.transport.sendMail({ ...options, from });
+                        },
+                    };
                 },
             },
         ],
