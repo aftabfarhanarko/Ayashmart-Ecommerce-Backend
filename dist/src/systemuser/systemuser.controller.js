@@ -139,6 +139,12 @@ let SystemuserController = class SystemuserController {
         const filterCompanyId = (userRole === 'SUPER_ADMIN' || userRole === system_user_role_enum_1.SystemUserRole.SUPER_ADMIN) ? undefined : companyId;
         return this.systemuserService.remove(+id, filterCompanyId, performedByUserId);
     }
+    async permanentRemove(id, companyId, req) {
+        const performedByUserId = req?.user?.userId || req?.user?.sub;
+        const userRole = req?.user?.role;
+        const filterCompanyId = (userRole === 'SUPER_ADMIN' || userRole === system_user_role_enum_1.SystemUserRole.SUPER_ADMIN) ? undefined : companyId;
+        return this.systemuserService.permanentDelete(+id, filterCompanyId, performedByUserId);
+    }
     async assignPermissions(id, dto, companyId, req) {
         const assignerPermissions = req?.user?.permissions || [];
         const performedByUserId = req?.user?.userId || req?.user?.sub;
@@ -292,6 +298,16 @@ __decorate([
     __metadata("design:paramtypes", [String, String, Object]),
     __metadata("design:returntype", void 0)
 ], SystemuserController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Delete)(':id/permanent'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, company_id_decorator_1.CompanyId)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], SystemuserController.prototype, "permanentRemove", null);
 __decorate([
     (0, common_1.Patch)(':id/permissions'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

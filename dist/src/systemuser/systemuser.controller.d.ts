@@ -91,6 +91,9 @@ export declare class SystemuserController {
     remove(id: string, companyId?: string, req?: any): Promise<{
         success: boolean;
     }>;
+    permanentRemove(id: string, companyId?: string, req?: any): Promise<{
+        success: boolean;
+    }>;
     assignPermissions(id: string, dto: AssignPermissionsDto, companyId?: string, req?: any): Promise<{
         statusCode: number;
         message: string;

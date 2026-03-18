@@ -238,6 +238,15 @@ export class SystemuserController {
     return this.systemuserService.remove(+id, filterCompanyId, performedByUserId);
   }
 
+  @Delete(':id/permanent')
+  @UseGuards(JwtAuthGuard)
+  async permanentRemove(@Param('id') id: string, @CompanyId() companyId?: string, @Req() req?: any) {
+    const performedByUserId = req?.user?.userId || req?.user?.sub;
+    const userRole = req?.user?.role;
+    const filterCompanyId = (userRole === 'SUPER_ADMIN' || userRole === SystemUserRole.SUPER_ADMIN) ? undefined : companyId;
+    return this.systemuserService.permanentDelete(+id, filterCompanyId, performedByUserId);
+  }
+
   @Patch(':id/permissions')
   @UseGuards(JwtAuthGuard)
   // @Permission(FeaturePermission.STAFF)

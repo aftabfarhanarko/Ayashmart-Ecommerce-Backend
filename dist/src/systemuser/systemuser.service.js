@@ -808,6 +808,42 @@ let SystemuserService = class SystemuserService {
         const { passwordHash, passwordSalt, ...safe } = restored;
         return safe;
     }
+    async permanentDelete(id, companyId, performedByUserId) {
+        const whereCondition = { id };
+        if (companyId) {
+            whereCondition.companyId = companyId;
+        }
+        const entity = await this.systemUserRepo.findOne({
+            where: whereCondition,
+            withDeleted: true,
+        });
+        if (!entity)
+            throw new common_1.NotFoundException('System user not found in trash');
+        if (!entity.deletedAt) {
+            throw new common_1.BadRequestException('System user is not in trash');
+        }
+        if (performedByUserId) {
+            try {
+                await this.activityLogService.logActivity({
+                    companyId: entity.companyId,
+                    action: activity_log_entity_1.ActivityAction.DELETE,
+                    entity: activity_log_entity_1.ActivityEntity.SYSTEM_USER,
+                    entityId: entity.id,
+                    entityName: entity.name || entity.email,
+                    description: `Permanently deleted system user: ${entity.name} (${entity.email})`,
+                    oldValues: { deletedAt: entity.deletedAt },
+                    newValues: { deletedAt: null },
+                    performedByUserId,
+                    targetUserId: entity.id,
+                });
+            }
+            catch (error) {
+                console.error('Failed to log activity:', error);
+            }
+        }
+        await this.systemUserRepo.remove(entity);
+        return { success: true };
+    }
     async login(dto) {
         const user = await this.systemUserRepo.findOne({
             where: { email: dto.email },
