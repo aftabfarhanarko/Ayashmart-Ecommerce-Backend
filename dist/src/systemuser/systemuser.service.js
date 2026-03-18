@@ -748,6 +748,66 @@ let SystemuserService = class SystemuserService {
         await this.systemUserRepo.softRemove(entity);
         return { success: true };
     }
+    async listTrashed(companyId) {
+        const qb = this.systemUserRepo
+            .createQueryBuilder('user')
+            .withDeleted()
+            .leftJoinAndSelect('user.package', 'package')
+            .leftJoinAndSelect('user.theme', 'theme')
+            .leftJoinAndSelect('user.invoices', 'invoices')
+            .where('user.deletedAt IS NOT NULL')
+            .orderBy('user.deletedAt', 'DESC');
+        if (companyId) {
+            qb.andWhere('user.companyId = :companyId', { companyId });
+        }
+        const list = await qb.getMany();
+        return list.map(({ passwordHash, passwordSalt, ...safe }) => safe);
+    }
+    async restore(id, companyId, performedByUserId) {
+        const whereCondition = { id };
+        if (companyId) {
+            whereCondition.companyId = companyId;
+        }
+        const entity = await this.systemUserRepo.findOne({
+            where: whereCondition,
+            withDeleted: true,
+            relations: ['package', 'theme', 'invoices'],
+        });
+        if (!entity)
+            throw new common_1.NotFoundException('System user not found');
+        if (!entity.deletedAt) {
+            const { passwordHash, passwordSalt, ...safe } = entity;
+            return safe;
+        }
+        await this.systemUserRepo.recover(entity);
+        const restored = await this.systemUserRepo.findOne({
+            where: { id: entity.id },
+            relations: ['package', 'theme', 'invoices'],
+        });
+        if (!restored)
+            throw new common_1.NotFoundException('System user not found after restore');
+        if (performedByUserId) {
+            try {
+                await this.activityLogService.logActivity({
+                    companyId: restored.companyId,
+                    action: activity_log_entity_1.ActivityAction.UPDATE,
+                    entity: activity_log_entity_1.ActivityEntity.SYSTEM_USER,
+                    entityId: restored.id,
+                    entityName: restored.name || restored.email,
+                    description: `Restored system user: ${restored.name} (${restored.email})`,
+                    oldValues: { deletedAt: entity.deletedAt },
+                    newValues: { deletedAt: null },
+                    performedByUserId,
+                    targetUserId: restored.id,
+                });
+            }
+            catch (error) {
+                console.error('Failed to log activity:', error);
+            }
+        }
+        const { passwordHash, passwordSalt, ...safe } = restored;
+        return safe;
+    }
     async login(dto) {
         const user = await this.systemUserRepo.findOne({
             where: { email: dto.email },

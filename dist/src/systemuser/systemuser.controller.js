@@ -51,6 +51,14 @@ let SystemuserController = class SystemuserController {
         }
         return this.systemuserService.findAll(companyId);
     }
+    async listTrash(companyIdFromQuery, companyIdFromToken, req) {
+        const userRole = req?.user?.role;
+        if (userRole === 'SUPER_ADMIN' || userRole === system_user_role_enum_1.SystemUserRole.SUPER_ADMIN) {
+            return this.systemuserService.listTrashed(undefined);
+        }
+        const companyId = companyIdFromQuery || companyIdFromToken;
+        return this.systemuserService.listTrashed(companyId);
+    }
     async getActivityLogs(companyId, performedByUserId, targetUserId, action, entity, startDate, endDate, limit, offset, req) {
         const userRole = req?.user?.role;
         const currentUserId = req?.user?.userId || req?.user?.sub;
@@ -116,6 +124,14 @@ let SystemuserController = class SystemuserController {
         const userRole = req?.user?.role;
         const filterCompanyId = (userRole === 'SUPER_ADMIN' || userRole === system_user_role_enum_1.SystemUserRole.SUPER_ADMIN) ? undefined : companyId;
         return this.systemuserService.update(+id, updateSystemuserDto, filterCompanyId, performedByUserId);
+    }
+    async restore(id, companyIdFromQuery, companyIdFromToken, req) {
+        const performedByUserId = req?.user?.userId || req?.user?.sub;
+        const userRole = req?.user?.role;
+        const filterCompanyId = userRole === 'SUPER_ADMIN' || userRole === system_user_role_enum_1.SystemUserRole.SUPER_ADMIN
+            ? undefined
+            : (companyIdFromQuery || companyIdFromToken);
+        return this.systemuserService.restore(+id, filterCompanyId, performedByUserId);
     }
     remove(id, companyId, req) {
         const performedByUserId = req?.user?.userId || req?.user?.sub;
@@ -190,6 +206,15 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SystemuserController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Get)('trash'),
+    __param(0, (0, common_1.Query)('companyId')),
+    __param(1, (0, company_id_decorator_1.CompanyId)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], SystemuserController.prototype, "listTrash", null);
+__decorate([
     (0, common_1.Get)('activity-logs'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, company_id_decorator_1.CompanyId)()),
@@ -247,6 +272,16 @@ __decorate([
     __metadata("design:paramtypes", [String, update_systemuser_dto_1.UpdateSystemuserDto, String, Object]),
     __metadata("design:returntype", void 0)
 ], SystemuserController.prototype, "update", null);
+__decorate([
+    (0, common_1.Patch)(':id/restore'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('companyId')),
+    __param(2, (0, company_id_decorator_1.CompanyId)()),
+    __param(3, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String, Object]),
+    __metadata("design:returntype", Promise)
+], SystemuserController.prototype, "restore", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

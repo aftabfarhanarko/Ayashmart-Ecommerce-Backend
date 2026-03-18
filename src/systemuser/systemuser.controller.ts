@@ -79,6 +79,20 @@ export class SystemuserController {
     return this.systemuserService.findAll(companyId);
   }
 
+  @Get('trash')
+  async listTrash(
+    @Query('companyId') companyIdFromQuery?: string,
+    @CompanyId() companyIdFromToken?: string,
+    @Req() req?: any,
+  ) {
+    const userRole = req?.user?.role;
+    if (userRole === 'SUPER_ADMIN' || userRole === SystemUserRole.SUPER_ADMIN) {
+      return this.systemuserService.listTrashed(undefined);
+    }
+    const companyId = companyIdFromQuery || companyIdFromToken;
+    return this.systemuserService.listTrashed(companyId);
+  }
+
   // activity-logs routes MUST be declared before :id - otherwise :id catches "activity-logs" as id
   @Get('activity-logs')
   @UseGuards(JwtAuthGuard)
@@ -195,6 +209,22 @@ export class SystemuserController {
     // Superadmins can update any system user (ignore companyId filter)
     const filterCompanyId = (userRole === 'SUPER_ADMIN' || userRole === SystemUserRole.SUPER_ADMIN) ? undefined : companyId;
     return this.systemuserService.update(+id, updateSystemuserDto, filterCompanyId, performedByUserId);
+  }
+
+  @Patch(':id/restore')
+  async restore(
+    @Param('id') id: string,
+    @Query('companyId') companyIdFromQuery?: string,
+    @CompanyId() companyIdFromToken?: string,
+    @Req() req?: any,
+  ) {
+    const performedByUserId = req?.user?.userId || req?.user?.sub;
+    const userRole = req?.user?.role;
+    const filterCompanyId =
+      userRole === 'SUPER_ADMIN' || userRole === SystemUserRole.SUPER_ADMIN
+        ? undefined
+        : (companyIdFromQuery || companyIdFromToken);
+    return this.systemuserService.restore(+id, filterCompanyId, performedByUserId);
   }
 
   @Delete(':id')

@@ -76,6 +76,7 @@ export declare class SystemuserController {
         updatedAt: Date;
         deletedAt?: Date;
     }[]>;
+    listTrash(companyIdFromQuery?: string, companyIdFromToken?: string, req?: any): Promise<any[]>;
     getActivityLogs(companyId?: string, performedByUserId?: string, targetUserId?: string, action?: ActivityAction, entity?: ActivityEntity, startDate?: string, endDate?: string, limit?: string, offset?: string, req?: any): Promise<{
         logs: import("./entities/activity-log.entity").ActivityLog[];
         total: number;
@@ -86,6 +87,7 @@ export declare class SystemuserController {
     findOne(id: string, companyId?: string, req?: any): Promise<any>;
     revertPackage(id: string, companyId?: string, req?: any): Promise<any>;
     update(id: string, updateSystemuserDto: UpdateSystemuserDto, companyId?: string, req?: any): Promise<any>;
+    restore(id: string, companyIdFromQuery?: string, companyIdFromToken?: string, req?: any): Promise<any>;
     remove(id: string, companyId?: string, req?: any): Promise<{
         success: boolean;
     }>;

@@ -115,6 +115,8 @@ export declare class SystemuserService {
     remove(id: number, companyId?: string, performedByUserId?: number): Promise<{
         success: boolean;
     }>;
+    listTrashed(companyId?: string): Promise<any[]>;
+    restore(id: number, companyId?: string, performedByUserId?: number): Promise<any>;
     login(dto: LoginDto): Promise<{
         accessToken: string;
         refreshToken: string;
