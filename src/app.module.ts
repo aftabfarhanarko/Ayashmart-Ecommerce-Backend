@@ -40,6 +40,7 @@ import { SaleInvoiceModule } from './sale-invoice/sale-invoice.module';
 import { CreditNoteModule } from './credit-note/credit-note.module';
 import { MediaModule } from './media/media.module';
 import { ResellerModule } from './reseller/reseller.module';
+import { CashModule } from './cash/cash.module';
 import { TopProductsModule } from './top-products/top-products.module';
 
 @Global()
@@ -101,6 +102,7 @@ import { TopProductsModule } from './top-products/top-products.module';
     MediaModule,
     ResellerModule,
     TopProductsModule,
+    CashModule,
   ],
 
   controllers: [AppController],
@@ -148,9 +150,15 @@ import { TopProductsModule } from './top-products/top-products.module';
               | undefined;
 
             try {
-              setting = await settingService.findFirst();
+              setting = await settingService.findFirstByCompanyId(
+                '__SUPERADMIN_SMTP__',
+              );
             } catch {
-              // No settings row yet; fallback to env
+              try {
+                setting = await settingService.findFirst();
+              } catch {
+                // No settings row yet; fallback to env
+              }
             }
 
             const smtpUser = setting?.smtpUser ?? config.get<string>('SMTP_USER');

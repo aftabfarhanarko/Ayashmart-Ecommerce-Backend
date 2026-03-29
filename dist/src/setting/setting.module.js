@@ -13,13 +13,14 @@ const setting_service_1 = require("./setting.service");
 const setting_controller_1 = require("./setting.controller");
 const setting_entity_1 = require("./entities/setting.entity");
 const request_context_service_1 = require("../common/services/request-context.service");
+const superadmin_setting_controller_1 = require("./superadmin-setting.controller");
 let SettingModule = class SettingModule {
 };
 exports.SettingModule = SettingModule;
 exports.SettingModule = SettingModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([setting_entity_1.Setting])],
-        controllers: [setting_controller_1.SettingController],
+        controllers: [setting_controller_1.SettingController, superadmin_setting_controller_1.SuperadminSettingController],
         providers: [setting_service_1.SettingService, request_context_service_1.RequestContextService],
         exports: [setting_service_1.SettingService],
     })

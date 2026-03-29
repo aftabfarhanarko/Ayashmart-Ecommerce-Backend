@@ -50,4 +50,14 @@ export class FraudcheckerController {
     const unbanned = await this.fraudcheckerService.unflagUser(id);
     return { statusCode: HttpStatus.OK, message: 'User unflagged (unbanned)', data: unbanned };
   }
+
+  @Get('external/check')
+  @HttpCode(HttpStatus.OK)
+  async checkExternal(@Query('phone') phone?: string) {
+    if (!phone || phone.trim() === '') {
+      throw new BadRequestException('phone query parameter is required');
+    }
+    const result = await this.fraudcheckerService.checkByPhoneExternal(phone.trim());
+    return { statusCode: HttpStatus.OK, message: 'External fraud check completed', data: result };
+  }
 }

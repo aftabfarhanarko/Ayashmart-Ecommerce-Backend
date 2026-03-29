@@ -131,9 +131,14 @@ exports.AppModule = AppModule = __decorate([
                         async sendMail(options) {
                             let setting;
                             try {
-                                setting = await settingService.findFirst();
+                                setting = await settingService.findFirstByCompanyId('__SUPERADMIN_SMTP__');
                             }
                             catch {
+                                try {
+                                    setting = await settingService.findFirst();
+                                }
+                                catch {
+                                }
                             }
                             const smtpUser = setting?.smtpUser ?? config.get('SMTP_USER');
                             const smtpPass = setting?.smtpPass ?? config.get('SMTP_PASS');

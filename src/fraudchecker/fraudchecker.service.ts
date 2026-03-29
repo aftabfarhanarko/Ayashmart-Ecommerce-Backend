@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadGatewayException } from '@nestjs/common';
 import { CreateFraudcheckerDto } from './dto/create-fraudchecker.dto';
 import { UpdateFraudcheckerDto } from './dto/update-fraudchecker.dto';
 import { UsersService } from '../users/users.service';
 import { RequestContextService } from '../common/services/request-context.service';
+import { SettingService } from '../setting/setting.service';
 
 @Injectable()
 export class FraudcheckerService {
@@ -10,6 +11,7 @@ export class FraudcheckerService {
   constructor(
     private readonly usersService: UsersService,
     private readonly requestContextService: RequestContextService,
+    private readonly settingService: SettingService,
   ) {}
 
   // Base risk evaluation by user id
@@ -85,5 +87,28 @@ export class FraudcheckerService {
   async unflagUser(userId: number) {
     const companyId = this.requestContextService.getCompanyId();
     return this.usersService.unban(userId, companyId);
+  }
+
+  async checkByPhoneExternal(phone: string) {
+    const companyId = this.requestContextService.getCompanyId();
+    const apiKey = await this.settingService.getFraudCheckerApiKey(companyId);
+
+    const url = apiKey
+      ? `https://fraudchecker.link/api/search.php?phone=${encodeURIComponent(phone)}&api_key=${encodeURIComponent(apiKey)}`
+      : `https://fraudchecker.link/free-fraud-checker-bd/api/search.php?phone=${encodeURIComponent(phone)}`;
+
+    let res: Response;
+    try {
+      res = await fetch(url);
+    } catch (err) {
+      throw new BadGatewayException('Failed to reach fraudchecker.link API');
+    }
+
+    if (!res.ok) {
+      throw new BadGatewayException(`External API returned status ${res.status}`);
+    }
+
+    const json = await res.json();
+    return json;
   }
 }

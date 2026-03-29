@@ -34,4 +34,9 @@ export class CreateSettingDto {
   @IsString()
   @MaxLength(255)
   smtpPass?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  fraudCheckerApiKey?: string;
 }
