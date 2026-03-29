@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CashExpense } from './entities/cash-expense.entity';
 import { CashIncome } from './entities/cash-income.entity';
-import { SaleInvoice } from '../sale-invoice/entities/sale-invoice.entity';
+import { Order } from '../orders/entities/order.entity';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 
@@ -23,19 +23,17 @@ export class CashService {
     private readonly expenseRepo: Repository<CashExpense>,
     @InjectRepository(CashIncome)
     private readonly incomeRepo: Repository<CashIncome>,
-    @InjectRepository(SaleInvoice)
-    private readonly saleInvoiceRepo: Repository<SaleInvoice>,
+    @InjectRepository(Order)
+    private readonly orderRepo: Repository<Order>,
   ) {}
 
   /** Get aggregated cash summary for a company */
   async getSummary(companyId: string) {
-    // Income from sale invoices
-    const invoiceResult = await this.saleInvoiceRepo
-      .createQueryBuilder('si')
-      .select('COALESCE(SUM(si.totalAmount), 0)', 'invoiceIncome')
-      .where('si.companyId = :companyId', { companyId })
-      .andWhere('si.deletedAt IS NULL')
-      .getRawOne();
+    // Income from paid orders (same source as dashboard Total Revenue)
+    const allOrders = await this.orderRepo.find({ where: { companyId } });
+    const invoiceIncome = allOrders
+      .filter((o) => o.isPaid || o.status === 'paid' || o.status === 'delivered')
+      .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
 
     // Manually added income entries
     const manualIncomeResult = await this.incomeRepo
@@ -53,7 +51,6 @@ export class CashService {
       .andWhere('ce.deletedAt IS NULL')
       .getRawOne();
 
-    const invoiceIncome = parseFloat(invoiceResult?.invoiceIncome ?? '0');
     const manualIncome = parseFloat(manualIncomeResult?.manualIncome ?? '0');
     const totalIncome = invoiceIncome + manualIncome;
     const totalExpense = parseFloat(expenseResult?.totalExpense ?? '0');

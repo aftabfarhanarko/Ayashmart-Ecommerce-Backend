@@ -5,6 +5,7 @@ import { Order } from '../orders/entities/order.entity';
 import { User } from '../users/entities/user.entity';
 import { ProductEntity } from '../products/entities/product.entity';
 import { CategoryEntity } from '../category/entities/category.entity';
+import { CashService } from '../cash/cash.service';
 import axios from 'axios';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class DashboardService {
         private productRepo: Repository<ProductEntity>,
         @InjectRepository(CategoryEntity)
         private categoryRepo: Repository<CategoryEntity>,
+        private cashService: CashService,
     ) { }
 
     async getDashboardData(companyId: string) {
@@ -68,10 +70,14 @@ export class DashboardService {
             0,
         );
 
+        // Get cash summary: manualIncome additions and expense deductions
+        const cashSummary = await this.cashService.getSummary(companyId);
+
         const overviewMetrics = {
             totalProducts: productStats.totalProducts,
             totalSales: customerStats.totalOrders,
-            totalRevenue: Math.round(totalRevenue * 100) / 100,
+            // Net Revenue = paid orders revenue + manual income − expenses
+            totalRevenue: Math.round((totalRevenue + cashSummary.manualIncome - cashSummary.totalExpense) * 100) / 100,
             totalStoreViews: customerStats.totalCustomers,
         };
 
