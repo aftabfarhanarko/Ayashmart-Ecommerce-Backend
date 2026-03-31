@@ -43,7 +43,7 @@ export class Order {
   paidAmount: number;
 
   @Column({ default: "pending" })
-  status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded";
+  status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded" | "incomplete";
 
   @Column({ nullable: true })
   paymentReference?: string;

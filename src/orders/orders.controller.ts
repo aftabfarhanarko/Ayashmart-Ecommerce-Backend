@@ -31,6 +31,34 @@ export class OrderController {
     return { statusCode: 201, message: "Order created", data: o };
   }
 
+  @Post("incomplete")
+  @Public()
+  async createIncomplete(
+    @Body() dto: CreateOrderDto,
+    @Query('companyId') companyIdFromQuery?: string,
+    @CompanyId() companyIdFromToken?: string,
+    @Query('orderId') orderId?: string,
+  ) {
+    const companyId = companyIdFromQuery || companyIdFromToken;
+    if (!companyId) {
+      throw new BadRequestException('companyId is required');
+    }
+    const o = await this.orderService.createIncomplete(dto, companyId, orderId ? +orderId : undefined);
+    return { statusCode: 201, message: "Incomplete order saved", data: o };
+  }
+
+  @Patch(":id/convert")
+  async convert(
+    @Param("id", ParseIntPipe) id: number,
+    @CompanyId() companyId: string,
+    @Req() req?: any,
+  ) {
+    const performedByUserId = req?.user?.role && ['SUPER_ADMIN', 'SYSTEM_OWNER', 'EMPLOYEE'].includes(req.user.role)
+      ? +(req.user.userId || req.user.sub) : undefined;
+    const o = await this.orderService.convertToRealOrder(id, companyId, performedByUserId);
+    return { statusCode: 200, message: "Order converted successfully", data: o };
+  }
+
   @Get('my-orders')
   async getMyOrders(@UserId() userId: number, @CompanyId() companyId: string) {
     const o = await this.orderService.findByCustomerId(userId, companyId);

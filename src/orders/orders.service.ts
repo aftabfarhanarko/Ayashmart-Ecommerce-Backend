@@ -300,6 +300,138 @@ export class OrderService {
     }
   }
 
+  async createIncomplete(createDto: CreateOrderDto, companyId: string, orderId?: number) {
+    let order: Order | null = null;
+    if (orderId) {
+      order = await this.orderRepo.findOne({ where: { id: orderId, companyId, status: "incomplete" } });
+    }
+    
+    if (!order) {
+      order = new Order();
+    }
+
+    order.customerName = createDto.customerName ?? order.customerName;
+    order.customerPhone = createDto.customerPhone ?? order.customerPhone;
+    order.customerEmail = createDto.customerEmail ?? order.customerEmail;
+    order.customerAddress = createDto.shippingAddress ?? createDto.customerAddress ?? order.customerAddress;
+    order.orderInfo = createDto.orderInfo ?? order.orderInfo;
+    order.status = "incomplete";
+    order.paymentMethod = createDto.paymentMethod ?? order.paymentMethod ?? "COD";
+    order.deliveryType = createDto.deliveryType ?? order.deliveryType ?? "INSIDEDHAKA";
+    order.companyId = companyId;
+
+    const items: any[] = [];
+    let total = 0;
+
+    for (const it of (createDto.items || [])) {
+      const product = await this.productRepo.findOne({ 
+        where: { id: it.productId, companyId, deletedAt: IsNull() }
+      });
+      if (product) {
+        const finalPrice = product.discountPrice || product.price;
+        const itemData = {
+          productId: product.id,
+          resellerId: product.resellerId ?? undefined,
+          product: {
+            id: product.id,
+            name: product.name,
+            sku: product.sku,
+            images: product.images?.map(img => ({ url: img.url, isPrimary: img.isPrimary })) || []
+          },
+          quantity: it.quantity,
+          unitPrice: +finalPrice,
+          totalPrice: +finalPrice * it.quantity,
+        };
+        total += itemData.totalPrice;
+        items.push(itemData);
+      }
+    }
+
+    order.items = items;
+    order.totalAmount = total;
+
+    return this.orderRepo.save(order);
+  }
+
+  async convertToRealOrder(id: number, companyId: string, performedByUserId?: number) {
+    const order = await this.orderRepo.findOne({
+      where: { id, companyId, status: "incomplete" },
+      relations: ["customer"]
+    });
+    if (!order) throw new NotFoundException("Incomplete order not found");
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. Reserve stock
+      for (const it of order.items) {
+        const product = await queryRunner.manager.findOne(ProductEntity, {
+          where: { id: it.productId, companyId, deletedAt: IsNull() }
+        });
+        if (!product) throw new NotFoundException(`Product ${it.productId} not found`);
+        if (product.stock < it.quantity) {
+          throw new BadRequestException(`Insufficient stock for product ${product.name}`);
+        }
+        product.stock -= it.quantity;
+        await queryRunner.manager.save(product);
+      }
+
+      // 2. Update status
+      order.status = "pending";
+      const savedOrder = await queryRunner.manager.save(order);
+      await queryRunner.commitTransaction();
+
+      await this.addStatusHistory(savedOrder.id, "incomplete", "pending", "Converted from incomplete order");
+
+      // 3. Trigger notifications (similar to create)
+      const fullOrder = await this.orderRepo.findOne({
+        where: { id: savedOrder.id, companyId },
+        relations: ["customer"]
+      });
+
+      if (fullOrder) {
+        try {
+          const createDto: CreateOrderDto = {
+            customerName: fullOrder.customerName,
+            customerPhone: fullOrder.customerPhone,
+            customerEmail: fullOrder.customerEmail,
+            items: fullOrder.items.map(it => ({ productId: it.productId, quantity: it.quantity })),
+            shippingAddress: fullOrder.customerAddress,
+            deliveryType: fullOrder.deliveryType,
+            paymentMethod: fullOrder.paymentMethod,
+          };
+          await this.sendOwnerNotifications(createDto, fullOrder);
+          await this.sendOrderStatusEmail(fullOrder, "placed");
+        } catch (e) {
+          console.error("Failed to send conversion notifications:", e);
+        }
+
+        if (performedByUserId) {
+          await this.activityLogService.logActivity({
+            companyId,
+            action: ActivityAction.STATUS_CHANGE,
+            entity: ActivityEntity.ORDER,
+            entityId: fullOrder.id,
+            entityName: `Order #${fullOrder.id}`,
+            description: `Converted incomplete order #${fullOrder.id} to real order`,
+            oldValues: { status: "incomplete" },
+            newValues: { status: "pending" },
+            performedByUserId,
+          });
+        }
+      }
+
+      return fullOrder;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   async findAll(companyId: string, resellerId?: number) {
     const orders = await this.orderRepo.find({
       where: {
@@ -343,6 +475,7 @@ export class OrderService {
     const delivered = orders.filter((o) => (o.status?.toLowerCase() || "") === "delivered").length;
     const cancelled = orders.filter((o) => (o.status?.toLowerCase() || "") === "cancelled").length;
     const refunded = orders.filter((o) => (o.status?.toLowerCase() || "") === "refunded").length;
+    const incomplete = orders.filter((o) => (o.status?.toLowerCase() || "") === "incomplete").length;
 
     const paidOrders = orders.filter(
       (o) => o.isPaid || o.status === "paid" || o.status === "delivered",
@@ -351,7 +484,7 @@ export class OrderService {
       (sum, o) => sum + Number(o.totalAmount || 0),
       0,
     );
-    const unpaidCount = orders.filter((o) => !o.isPaid && o.status !== "cancelled" && o.status !== "refunded").length;
+    const unpaidCount = orders.filter((o) => !o.isPaid && o.status !== "cancelled" && o.status !== "refunded" && o.status !== "incomplete").length;
 
     return {
       total,
@@ -362,6 +495,7 @@ export class OrderService {
       delivered,
       cancelled,
       refunded,
+      incomplete,
       totalRevenue,
       unpaidCount,
     };
