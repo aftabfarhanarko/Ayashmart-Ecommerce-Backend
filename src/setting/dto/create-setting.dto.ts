@@ -39,4 +39,9 @@ export class CreateSettingDto {
   @IsString()
   @MaxLength(500)
   fraudCheckerApiKey?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  orderReceiptUrl?: string;
 }

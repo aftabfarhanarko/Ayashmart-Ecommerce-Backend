@@ -39,10 +39,7 @@ export class ResellerService {
       .andWhere('product.companyId = :companyId', { companyId })
       .getRawOne<{ totalSoldQty: string; totalRevenue: string }>();
 
-    const totalSoldQty = Number(salesAgg?.totalSoldQty ?? 0);
-    const totalRevenue = Number(salesAgg?.totalRevenue ?? 0);
-
-    // Load reseller to get admin-defined commission %
+    // Load reseller to get admin-defined commission % and paid totals
     const reseller = await this.systemUserRepo.findOne({
       where: { id: resellerId },
     });
@@ -50,6 +47,9 @@ export class ResellerService {
       reseller?.resellerCommissionRate != null
         ? Number(reseller.resellerCommissionRate)
         : 0;
+
+    const totalSoldQty = Math.max(Number(salesAgg?.totalSoldQty ?? 0) - Number(reseller?.paidTotalSoldQty ?? 0), 0);
+    const totalRevenue = Math.max(Number(salesAgg?.totalRevenue ?? 0) - Number(reseller?.paidTotalEarning ?? 0), 0);
 
     // Admin takes commissionRate% from reseller's total revenue
     const totalCommission = (totalRevenue * commissionRate) / 100;
@@ -370,10 +370,21 @@ export class ResellerService {
     }
     const saved = await this.payoutRepo.save(payout);
 
-    // Reset reseller's sales history upon successful payout
-    await this.productRepo.update(
-      { resellerId: saved.resellerId, companyId: saved.companyId },
-      { sold: 0, totalIncome: 0 }
+    // Instead of resetting products, we update the reseller's snapshot of paid sales
+    const salesAgg = await this.productRepo
+      .createQueryBuilder('product')
+      .select('COALESCE(SUM(product.sold), 0)', 'totalSoldQty')
+      .addSelect('COALESCE(SUM(product.totalIncome), 0)', 'totalRevenue')
+      .where('product.resellerId = :resellerId', { resellerId: saved.resellerId })
+      .andWhere('product.companyId = :companyId', { companyId: saved.companyId })
+      .getRawOne<{ totalSoldQty: string; totalRevenue: string }>();
+
+    await this.systemUserRepo.update(
+      { id: saved.resellerId },
+      { 
+        paidTotalSoldQty: Number(salesAgg?.totalSoldQty ?? 0), 
+        paidTotalEarning: Number(salesAgg?.totalRevenue ?? 0) 
+      }
     );
 
     // Notify reseller by email (best-effort)

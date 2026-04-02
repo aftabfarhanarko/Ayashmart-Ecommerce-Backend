@@ -47,6 +47,10 @@ export class Setting {
   @Column({ nullable: true, length: 500 })
   fraudCheckerApiKey?: string;
 
+  // Order Payment Slip / App Sticker URL
+  @Column({ nullable: true, length: 500 })
+  orderReceiptUrl?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
