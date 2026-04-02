@@ -15,6 +15,9 @@ export declare class FraudcheckerController {
             isBanned: boolean;
             riskScore: number;
             riskReasons: string[];
+            successfulOrders: number;
+            cancelledOrders: number;
+            totalOrders: number;
         };
     } | {
         statusCode: HttpStatus;
@@ -29,6 +32,9 @@ export declare class FraudcheckerController {
                 isBanned: boolean;
                 riskScore: number;
                 riskReasons: string[];
+                successfulOrders: number;
+                cancelledOrders: number;
+                totalOrders: number;
             }[];
         };
     }>;

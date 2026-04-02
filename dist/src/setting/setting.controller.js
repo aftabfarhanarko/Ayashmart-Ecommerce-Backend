@@ -22,6 +22,7 @@ const company_id_guard_1 = require("../common/guards/company-id.guard");
 const request_context_service_1 = require("../common/services/request-context.service");
 const update_smtp_dto_1 = require("./dto/update-smtp.dto");
 const update_fraud_checker_dto_1 = require("./dto/update-fraud-checker.dto");
+const update_order_receipt_url_dto_1 = require("./dto/update-order-receipt-url.dto");
 let SettingController = class SettingController {
     constructor(settingService, requestContext) {
         this.settingService = settingService;
@@ -49,6 +50,16 @@ let SettingController = class SettingController {
         const companyId = this.requestContext.getCompanyId();
         const key = await this.settingService.getFraudCheckerApiKey(companyId);
         return { status: 'success', data: { fraudCheckerApiKey: key } };
+    }
+    async upsertOrderReceiptUrl(dto) {
+        const companyId = this.requestContext.getCompanyId();
+        const data = await this.settingService.upsertOrderReceiptUrl(companyId, dto);
+        return { status: 'success', message: 'Order receipt URL updated successfully', data };
+    }
+    async getOrderReceiptUrl() {
+        const companyId = this.requestContext.getCompanyId();
+        const url = await this.settingService.getOrderReceiptUrl(companyId);
+        return { status: 'success', data: { orderReceiptUrl: url } };
     }
     async findOne(id) {
         const data = await this.settingService.findOne(+id);
@@ -97,6 +108,19 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], SettingController.prototype, "getFraudCheckerApi", null);
+__decorate([
+    (0, common_1.Patch)('order-receipt-url'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [update_order_receipt_url_dto_1.UpdateOrderReceiptUrlDto]),
+    __metadata("design:returntype", Promise)
+], SettingController.prototype, "upsertOrderReceiptUrl", null);
+__decorate([
+    (0, common_1.Get)('order-receipt-url'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], SettingController.prototype, "getOrderReceiptUrl", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

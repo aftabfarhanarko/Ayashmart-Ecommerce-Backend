@@ -122,6 +122,38 @@ let SettingService = class SettingService {
         });
         return entity?.fraudCheckerApiKey ?? null;
     }
+    async upsertOrderReceiptUrl(companyId, dto) {
+        let entity = null;
+        try {
+            entity = await this.settingRepo.findOne({
+                where: { companyId },
+                order: { id: 'ASC' },
+            });
+        }
+        catch {
+            entity = null;
+        }
+        if (!entity) {
+            const created = this.settingRepo.create({
+                companyId,
+                companyName: 'Default',
+                email: 'noreply@example.com',
+                orderReceiptUrl: dto.orderReceiptUrl ?? null,
+            });
+            return this.settingRepo.save(created);
+        }
+        const merged = this.settingRepo.merge(entity, {
+            orderReceiptUrl: dto.orderReceiptUrl ?? null,
+        });
+        return this.settingRepo.save(merged);
+    }
+    async getOrderReceiptUrl(companyId) {
+        const entity = await this.settingRepo.findOne({
+            where: { companyId },
+            order: { id: 'ASC' },
+        });
+        return entity?.orderReceiptUrl ?? null;
+    }
 };
 exports.SettingService = SettingService;
 exports.SettingService = SettingService = __decorate([

@@ -13,6 +13,7 @@ export declare class Setting {
     smtpPass?: string;
     smtpFrom?: string;
     fraudCheckerApiKey?: string;
+    orderReceiptUrl?: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;

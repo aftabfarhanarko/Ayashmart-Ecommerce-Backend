@@ -25,14 +25,14 @@ let FraudcheckerService = class FraudcheckerService {
         const user = await this.usersService.findOne(userId, companyId);
         const reasons = [];
         let score = 0;
+        const successful = user.successfulOrdersCount ?? 0;
+        const cancelled = user.cancelledOrdersCount ?? 0;
+        const total = successful + cancelled;
         if (user.isBanned) {
             reasons.push('User is banned');
             score = 100;
         }
         else {
-            const successful = user.successfulOrdersCount ?? 0;
-            const cancelled = user.cancelledOrdersCount ?? 0;
-            const total = successful + cancelled;
             const cancelRate = total > 0 ? cancelled / total : 0;
             if (cancelRate >= 0.5) {
                 reasons.push('High cancellation rate (>= 50%)');
@@ -57,6 +57,9 @@ let FraudcheckerService = class FraudcheckerService {
             isBanned: user.isBanned,
             riskScore: score,
             riskReasons: reasons,
+            successfulOrders: successful,
+            cancelledOrders: cancelled,
+            totalOrders: total,
         };
     }
     async checkUserRiskByPhone(phone) {

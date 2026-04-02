@@ -7,6 +7,7 @@ import { CompanyIdGuard } from '../common/guards/company-id.guard';
 import { RequestContextService } from '../common/services/request-context.service';
 import { UpdateSmtpDto } from './dto/update-smtp.dto';
 import { UpdateFraudCheckerDto } from './dto/update-fraud-checker.dto';
+import { UpdateOrderReceiptUrlDto } from './dto/update-order-receipt-url.dto';
 
 @Controller('setting')
 @UseGuards(JwtAuthGuard, CompanyIdGuard)
@@ -47,6 +48,20 @@ export class SettingController {
     const companyId = this.requestContext.getCompanyId();
     const key = await this.settingService.getFraudCheckerApiKey(companyId);
     return { status: 'success', data: { fraudCheckerApiKey: key } };
+  }
+
+  @Patch('order-receipt-url')
+  async upsertOrderReceiptUrl(@Body() dto: UpdateOrderReceiptUrlDto) {
+    const companyId = this.requestContext.getCompanyId();
+    const data = await this.settingService.upsertOrderReceiptUrl(companyId, dto);
+    return { status: 'success', message: 'Order receipt URL updated successfully', data };
+  }
+
+  @Get('order-receipt-url')
+  async getOrderReceiptUrl() {
+    const companyId = this.requestContext.getCompanyId();
+    const url = await this.settingService.getOrderReceiptUrl(companyId);
+    return { status: 'success', data: { orderReceiptUrl: url } };
   }
 
   @Get(':id')

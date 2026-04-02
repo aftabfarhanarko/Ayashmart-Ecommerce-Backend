@@ -14,6 +14,9 @@ export declare class FraudcheckerService {
         isBanned: boolean;
         riskScore: number;
         riskReasons: string[];
+        successfulOrders: number;
+        cancelledOrders: number;
+        totalOrders: number;
     }>;
     checkUserRiskByPhone(phone: string): Promise<{
         userId: number;
@@ -23,6 +26,9 @@ export declare class FraudcheckerService {
         isBanned: boolean;
         riskScore: number;
         riskReasons: string[];
+        successfulOrders: number;
+        cancelledOrders: number;
+        totalOrders: number;
     }>;
     checkUserRiskByEmail(email: string): Promise<{
         userId: number;
@@ -32,6 +38,9 @@ export declare class FraudcheckerService {
         isBanned: boolean;
         riskScore: number;
         riskReasons: string[];
+        successfulOrders: number;
+        cancelledOrders: number;
+        totalOrders: number;
     }>;
     checkUserRiskByName(name: string): Promise<{
         count: number;
@@ -43,6 +52,9 @@ export declare class FraudcheckerService {
             isBanned: boolean;
             riskScore: number;
             riskReasons: string[];
+            successfulOrders: number;
+            cancelledOrders: number;
+            totalOrders: number;
         }[];
     }>;
     flagUser(userId: number, reason?: string): Promise<import("../users/entities/user.entity").User>;

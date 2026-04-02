@@ -185,6 +185,14 @@ __decorate([
     __metadata("design:type", Number)
 ], SystemUser.prototype, "resellerCommissionRate", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'int', default: 0, nullable: true }),
+    __metadata("design:type", Number)
+], SystemUser.prototype, "paidTotalSoldQty", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 12, scale: 2, default: 0, nullable: true }),
+    __metadata("design:type", Number)
+], SystemUser.prototype, "paidTotalEarning", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], SystemUser.prototype, "createdAt", void 0);

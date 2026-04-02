@@ -40,14 +40,14 @@ let ResellerService = class ResellerService {
             .where('product.resellerId = :resellerId', { resellerId })
             .andWhere('product.companyId = :companyId', { companyId })
             .getRawOne();
-        const totalSoldQty = Number(salesAgg?.totalSoldQty ?? 0);
-        const totalRevenue = Number(salesAgg?.totalRevenue ?? 0);
         const reseller = await this.systemUserRepo.findOne({
             where: { id: resellerId },
         });
         const commissionRate = reseller?.resellerCommissionRate != null
             ? Number(reseller.resellerCommissionRate)
             : 0;
+        const totalSoldQty = Math.max(Number(salesAgg?.totalSoldQty ?? 0) - Number(reseller?.paidTotalSoldQty ?? 0), 0);
+        const totalRevenue = Math.max(Number(salesAgg?.totalRevenue ?? 0) - Number(reseller?.paidTotalEarning ?? 0), 0);
         const totalCommission = (totalRevenue * commissionRate) / 100;
         const resellerNetEarning = totalRevenue - totalCommission;
         const paidPayouts = await this.payoutRepo
@@ -289,7 +289,17 @@ let ResellerService = class ResellerService {
             payout.invoiceNumber = `RP-INV-${payout.companyId}-${id}-${yyyy}${mm}${dd}`;
         }
         const saved = await this.payoutRepo.save(payout);
-        await this.productRepo.update({ resellerId: saved.resellerId, companyId: saved.companyId }, { sold: 0, totalIncome: 0 });
+        const salesAgg = await this.productRepo
+            .createQueryBuilder('product')
+            .select('COALESCE(SUM(product.sold), 0)', 'totalSoldQty')
+            .addSelect('COALESCE(SUM(product.totalIncome), 0)', 'totalRevenue')
+            .where('product.resellerId = :resellerId', { resellerId: saved.resellerId })
+            .andWhere('product.companyId = :companyId', { companyId: saved.companyId })
+            .getRawOne();
+        await this.systemUserRepo.update({ id: saved.resellerId }, {
+            paidTotalSoldQty: Number(salesAgg?.totalSoldQty ?? 0),
+            paidTotalEarning: Number(salesAgg?.totalRevenue ?? 0)
+        });
         try {
             const reseller = await this.systemUserRepo.findOne({
                 where: { id: saved.resellerId },

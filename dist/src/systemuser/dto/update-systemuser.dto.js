@@ -26,6 +26,16 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], PathaoConfigDto.prototype, "clientSecret", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PathaoConfigDto.prototype, "username", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PathaoConfigDto.prototype, "password", void 0);
 class SteadfastConfigDto {
 }
 exports.SteadfastConfigDto = SteadfastConfigDto;

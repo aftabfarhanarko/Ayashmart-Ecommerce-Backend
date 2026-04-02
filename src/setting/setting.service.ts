@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Setting } from './entities/setting.entity';
 import { UpdateSmtpDto } from './dto/update-smtp.dto';
+import { UpdateOrderReceiptUrlDto } from './dto/update-order-receipt-url.dto';
 import { UpdateFraudCheckerDto } from './dto/update-fraud-checker.dto';
 
 @Injectable()
@@ -121,5 +122,40 @@ export class SettingService {
       order: { id: 'ASC' },
     });
     return entity?.fraudCheckerApiKey ?? null;
+  }
+
+  async upsertOrderReceiptUrl(companyId: string, dto: UpdateOrderReceiptUrlDto) {
+    let entity: Setting | null = null;
+    try {
+      entity = await this.settingRepo.findOne({
+        where: { companyId },
+        order: { id: 'ASC' },
+      });
+    } catch {
+      entity = null;
+    }
+
+    if (!entity) {
+      const created = this.settingRepo.create({
+        companyId,
+        companyName: 'Default',
+        email: 'noreply@example.com',
+        orderReceiptUrl: dto.orderReceiptUrl ?? null,
+      } as Partial<Setting>);
+      return this.settingRepo.save(created);
+    }
+
+    const merged = this.settingRepo.merge(entity, {
+      orderReceiptUrl: dto.orderReceiptUrl ?? null,
+    });
+    return this.settingRepo.save(merged);
+  }
+
+  async getOrderReceiptUrl(companyId: string): Promise<string | null> {
+    const entity = await this.settingRepo.findOne({
+      where: { companyId },
+      order: { id: 'ASC' },
+    });
+    return entity?.orderReceiptUrl ?? null;
   }
 }

@@ -22,13 +22,14 @@ export class FraudcheckerService {
     const reasons: string[] = [];
     let score = 0;
 
+    const successful = user.successfulOrdersCount ?? 0;
+    const cancelled = user.cancelledOrdersCount ?? 0;
+    const total = successful + cancelled;
+
     if (user.isBanned) {
       reasons.push('User is banned');
       score = 100;
     } else {
-      const successful = user.successfulOrdersCount ?? 0;
-      const cancelled = user.cancelledOrdersCount ?? 0;
-      const total = successful + cancelled;
       const cancelRate = total > 0 ? cancelled / total : 0;
 
       if (cancelRate >= 0.5) {
@@ -55,6 +56,9 @@ export class FraudcheckerService {
       isBanned: user.isBanned,
       riskScore: score,
       riskReasons: reasons,
+      successfulOrders: successful,
+      cancelledOrders: cancelled,
+      totalOrders: total,
     };
   }
 

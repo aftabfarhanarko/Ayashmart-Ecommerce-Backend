@@ -89,6 +89,8 @@ export declare class SystemuserService {
         pathaoConfig: {
             clientId?: string;
             clientSecret?: string;
+            username?: string;
+            password?: string;
         };
         steadfastConfig: {
             apiKey?: string;
@@ -105,6 +107,8 @@ export declare class SystemuserService {
         permissions: string[];
         role: SystemUserRole;
         resellerCommissionRate?: number | null;
+        paidTotalSoldQty: number;
+        paidTotalEarning: number;
         createdAt: Date;
         updatedAt: Date;
         deletedAt?: Date;

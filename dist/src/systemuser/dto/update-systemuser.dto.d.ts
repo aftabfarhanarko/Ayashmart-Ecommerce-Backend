@@ -2,6 +2,8 @@ import { CreateSystemuserDto } from './create-systemuser.dto';
 export declare class PathaoConfigDto {
     clientId?: string;
     clientSecret?: string;
+    username?: string;
+    password?: string;
 }
 export declare class SteadfastConfigDto {
     apiKey?: string;
