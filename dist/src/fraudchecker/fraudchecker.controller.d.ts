@@ -42,4 +42,9 @@ export declare class FraudcheckerController {
         message: string;
         data: import("../users/entities/user.entity").User;
     }>;
+    checkExternal(phone?: string): Promise<{
+        statusCode: HttpStatus;
+        message: string;
+        data: any;
+    }>;
 }

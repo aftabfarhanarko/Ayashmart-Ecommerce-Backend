@@ -108,6 +108,7 @@ export class InvoiceService {
       );
 
       await this.mailerTransport.sendMail({
+        companyId: customer.companyId,
         to: adminEmail,
         subject: `New Invoice Created - ${savedInvoice.invoiceNumber}`,
         html: emailHtml,
@@ -434,6 +435,7 @@ export class InvoiceService {
       );
 
       await this.mailerTransport.sendMail({
+        companyId: customer.companyId,
         to: adminEmail,
         subject: `Bank Payment Submitted - ${invoice.invoiceNumber}`,
         html: emailHtml,
@@ -496,6 +498,7 @@ export class InvoiceService {
       );
 
       await this.mailerTransport.sendMail({
+        companyId: customer.companyId,
         to: customer.email,
         subject: `Payment Confirmed - Invoice ${invoice.invoiceNumber}`,
         html: emailHtml,
@@ -533,6 +536,7 @@ export class InvoiceService {
       );
 
       await this.mailerTransport.sendMail({
+        companyId: customer.companyId,
         to: customer.email,
         subject: `Payment Update Required - Invoice ${invoice.invoiceNumber}`,
         html: emailHtml,

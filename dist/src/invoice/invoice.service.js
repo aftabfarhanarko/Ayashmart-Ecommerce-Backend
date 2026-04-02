@@ -74,6 +74,7 @@ let InvoiceService = class InvoiceService {
                 minute: '2-digit'
             }), customer.companyName || '');
             await this.mailerTransport.sendMail({
+                companyId: customer.companyId,
                 to: adminEmail,
                 subject: `New Invoice Created - ${savedInvoice.invoiceNumber}`,
                 html: emailHtml,
@@ -314,6 +315,7 @@ let InvoiceService = class InvoiceService {
                 minute: '2-digit'
             }), customer.companyName || '');
             await this.mailerTransport.sendMail({
+                companyId: customer.companyId,
                 to: adminEmail,
                 subject: `Bank Payment Submitted - ${invoice.invoiceNumber}`,
                 html: emailHtml,
@@ -353,6 +355,7 @@ let InvoiceService = class InvoiceService {
                 minute: '2-digit'
             }), customer.companyName || '');
             await this.mailerTransport.sendMail({
+                companyId: customer.companyId,
                 to: customer.email,
                 subject: `Payment Confirmed - Invoice ${invoice.invoiceNumber}`,
                 html: emailHtml,
@@ -374,6 +377,7 @@ let InvoiceService = class InvoiceService {
             const customer = invoice.customer;
             const emailHtml = (0, templates_1.generatePaymentRejectionEmail)(customer.name, invoice.invoiceNumber, invoice.bankPayment.bankName || 'Bank Transfer', invoice.bankPayment.amount || 0, reason, customer.companyName || '');
             await this.mailerTransport.sendMail({
+                companyId: customer.companyId,
                 to: customer.email,
                 subject: `Payment Update Required - Invoice ${invoice.invoiceNumber}`,
                 html: emailHtml,

@@ -45,11 +45,7 @@ let CategoryController = class CategoryController {
         const companyId = companyIdFromQuery || companyIdFromToken;
         const role = req?.user?.role;
         const numericUserId = +(req?.user?.userId || req?.user?.sub);
-        const resellerId = role === system_user_role_enum_1.SystemUserRole.RESELLER
-            ? numericUserId
-            : resellerIdFromQuery
-                ? +resellerIdFromQuery
-                : undefined;
+        const resellerId = resellerIdFromQuery ? +resellerIdFromQuery : undefined;
         const categories = await this.categoryService.findAll(companyId, resellerId);
         return { statusCode: common_1.HttpStatus.OK, data: categories };
     }

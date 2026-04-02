@@ -73,7 +73,7 @@ let ProductService = class ProductService {
                 discountPrice: createDto.discountPrice,
                 category,
                 isActive: createDto.isActive ?? true,
-                status: createDto.status || 'published',
+                status: resellerId ? 'draft' : (createDto.status || 'published'),
                 description: createDto.description,
                 images: createDto.images,
                 thumbnail: createDto.thumbnail,
@@ -679,6 +679,48 @@ let ProductService = class ProductService {
         const saved = await this.productRepository.save(product);
         await this.clearCache(companyId);
         return saved;
+    }
+    async rejectProduct(id, companyId, reason) {
+        const product = await this.productRepository.findOne({
+            where: { id, companyId, deletedAt: (0, typeorm_2.IsNull)() },
+        });
+        if (!product)
+            throw new common_1.NotFoundException("Product not found");
+        if (product.status !== 'draft')
+            throw new common_1.BadRequestException("Only pending (draft) products can be rejected");
+        product.status = 'trashed';
+        product.deletedAt = new Date();
+        const saved = await this.productRepository.save(product);
+        await this.clearCache(companyId);
+        return saved;
+    }
+    async getPendingApprovalProducts(companyId) {
+        const rows = await this.productRepository
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoin('system_users', 'reseller', 'reseller.id = product.resellerId')
+            .addSelect(['reseller.id', 'reseller.name', 'reseller.email', 'reseller.phone', 'reseller.photo'])
+            .where('product.companyId = :companyId', { companyId })
+            .andWhere('product.status = :status', { status: 'draft' })
+            .andWhere('product.resellerId IS NOT NULL')
+            .andWhere('product.deletedAt IS NULL')
+            .orderBy('product.createdAt', 'DESC')
+            .getRawAndEntities();
+        return rows.entities.map((product, i) => {
+            const raw = rows.raw[i];
+            return {
+                ...product,
+                reseller: raw.reseller_name
+                    ? {
+                        id: raw.reseller_id,
+                        name: raw.reseller_name,
+                        email: raw.reseller_email,
+                        phone: raw.reseller_phone,
+                        photo: raw.reseller_photo,
+                    }
+                    : null,
+            };
+        });
     }
     async toggleActive(id, active, companyId) {
         const product = await this.findOne(id, companyId);

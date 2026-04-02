@@ -53,12 +53,7 @@ export class CategoryController {
     const companyId = companyIdFromQuery || companyIdFromToken;
     const role: SystemUserRole | undefined = req?.user?.role;
     const numericUserId = +(req?.user?.userId || req?.user?.sub);
-    const resellerId =
-      role === SystemUserRole.RESELLER
-        ? numericUserId
-        : resellerIdFromQuery
-          ? +resellerIdFromQuery
-          : undefined;
+    const resellerId = resellerIdFromQuery ? +resellerIdFromQuery : undefined;
 
     const categories = await this.categoryService.findAll(
       companyId as string,

@@ -340,6 +340,7 @@ export class UsersService {
       `;
 
       await this.mailer.sendMail({
+        companyId,
         to: user.email,
         subject: 'Password Reset Request',
         html,

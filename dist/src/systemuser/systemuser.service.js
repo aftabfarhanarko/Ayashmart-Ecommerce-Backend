@@ -55,6 +55,7 @@ let SystemuserService = class SystemuserService {
             const displayCompany = user?.companyName;
             const subjectPrefix = displayCompany ? `${displayCompany} - ` : '';
             await this.mailer.sendMail({
+                companyId: user.companyId,
                 to: user.email,
                 subject: `${subjectPrefix}Password Updated Successfully`,
                 html,
@@ -79,6 +80,7 @@ let SystemuserService = class SystemuserService {
         <p>You can review this user in the admin console and set their password / approval status.</p>
       `;
             await this.mailer.sendMail({
+                companyId: user.companyId,
                 to: adminEmail,
                 subject: `${subjectPrefix}New reseller account pending approval`,
                 html,
@@ -94,6 +96,7 @@ let SystemuserService = class SystemuserService {
             const displayCompany = user?.companyName;
             const subjectPrefix = displayCompany ? `Welcome to ${displayCompany} - ` : 'Welcome - ';
             await this.mailer.sendMail({
+                companyId: user.companyId,
                 to: user.email,
                 subject: `${subjectPrefix}Your Account Credentials`,
                 html,
@@ -121,6 +124,7 @@ let SystemuserService = class SystemuserService {
             const displayCompany = user?.companyName;
             const subjectPrefix = displayCompany ? `${displayCompany} - ` : '';
             await this.mailer.sendMail({
+                companyId: user.companyId,
                 to: user.email,
                 subject: `${subjectPrefix}Your Store is Ready (Login & Subdomain)`,
                 html,
@@ -616,6 +620,7 @@ let SystemuserService = class SystemuserService {
           </div>
         `;
                 await this.mailer.sendMail({
+                    companyId: updatedUser.companyId,
                     to: updatedUser.email,
                     subject,
                     html,
@@ -953,6 +958,7 @@ let SystemuserService = class SystemuserService {
             const displayCompany = user?.companyName;
             const subjectPrefix = displayCompany ? `${displayCompany} - ` : '';
             await this.mailer.sendMail({
+                companyId: user.companyId,
                 to: user.email,
                 subject: `${subjectPrefix}Password Reset Request`,
                 html,

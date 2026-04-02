@@ -105,6 +105,7 @@ export class HelpService {
     try {
       const adminEmail = 'ashikurovi2003@gmail.com';
       await this.mailer.sendMail({
+        companyId: help.companyId,
         from: email,
         to: adminEmail,
         subject: `New Support Issue from ${help.email}`,

@@ -3,6 +3,7 @@ import { UpdateSettingDto } from './dto/update-setting.dto';
 import { Repository } from 'typeorm';
 import { Setting } from './entities/setting.entity';
 import { UpdateSmtpDto } from './dto/update-smtp.dto';
+import { UpdateFraudCheckerDto } from './dto/update-fraud-checker.dto';
 export declare class SettingService {
     private readonly settingRepo;
     constructor(settingRepo: Repository<Setting>);
@@ -16,4 +17,6 @@ export declare class SettingService {
     remove(id: number): Promise<{
         success: boolean;
     }>;
+    upsertFraudCheckerApiKey(companyId: string, dto: UpdateFraudCheckerDto): Promise<Setting>;
+    getFraudCheckerApiKey(companyId: string): Promise<string | null>;
 }

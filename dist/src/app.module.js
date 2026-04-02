@@ -47,6 +47,7 @@ const sale_invoice_module_1 = require("./sale-invoice/sale-invoice.module");
 const credit_note_module_1 = require("./credit-note/credit-note.module");
 const media_module_1 = require("./media/media.module");
 const reseller_module_1 = require("./reseller/reseller.module");
+const cash_module_1 = require("./cash/cash.module");
 const top_products_module_1 = require("./top-products/top-products.module");
 let AppModule = class AppModule {
 };
@@ -105,6 +106,7 @@ exports.AppModule = AppModule = __decorate([
             media_module_1.MediaModule,
             reseller_module_1.ResellerModule,
             top_products_module_1.TopProductsModule,
+            cash_module_1.CashModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [
@@ -131,7 +133,12 @@ exports.AppModule = AppModule = __decorate([
                         async sendMail(options) {
                             let setting;
                             try {
-                                setting = await settingService.findFirstByCompanyId('__SUPERADMIN_SMTP__');
+                                if (options?.companyId) {
+                                    setting = await settingService.findFirstByCompanyId(options.companyId);
+                                }
+                                if (!setting) {
+                                    setting = await settingService.findFirstByCompanyId('__SUPERADMIN_SMTP__');
+                                }
                             }
                             catch {
                                 try {

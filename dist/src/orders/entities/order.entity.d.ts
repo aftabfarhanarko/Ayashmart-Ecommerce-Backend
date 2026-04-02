@@ -24,7 +24,7 @@ export declare class Order {
     }>;
     totalAmount: number;
     paidAmount: number;
-    status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded";
+    status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded" | "incomplete";
     paymentReference?: string;
     orderInfo?: string;
     paymentMethod: "DIRECT" | "COD";

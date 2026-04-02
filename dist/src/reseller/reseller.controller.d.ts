@@ -16,7 +16,9 @@ export declare class ResellerController {
             totalEarning: number;
             commissionRate: number;
             totalCommission: number;
+            resellerNetEarning: number;
             pendingPayoutAmount: number;
+            totalWithdrawn: number;
         };
         message?: undefined;
     }>;
@@ -47,25 +49,7 @@ export declare class ResellerController {
         };
         message?: undefined;
     }>;
-    resellerMarkPayoutPaid(id: number, companyId: string, req: any): Promise<{
-        statusCode: HttpStatus;
-        message: string;
-        data?: undefined;
-    } | {
-        statusCode: HttpStatus;
-        message: string;
-        data: import("./entities/reseller-payout.entity").ResellerPayout;
-    }>;
     requestPayout(companyId: string, req: any, body: RequestPayoutDto): Promise<{
-        statusCode: HttpStatus;
-        message: string;
-        data?: undefined;
-    } | {
-        statusCode: HttpStatus;
-        message: string;
-        data: import("./entities/reseller-payout.entity").ResellerPayout;
-    }>;
-    adminCreatePayout(id: number, companyId: string, req: any, body: RequestPayoutDto): Promise<{
         statusCode: HttpStatus;
         message: string;
         data?: undefined;
@@ -95,6 +79,7 @@ export declare class ResellerController {
             commissionRate: number;
             totalCommission: number;
             pendingPayoutAmount: number;
+            totalWithdrawn: number;
             payouts: import("./entities/reseller-payout.entity").ResellerPayout[];
         }[];
         message?: undefined;

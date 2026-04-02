@@ -121,6 +121,7 @@ export class SaleInvoiceService {
       <p>Thank you for your business.</p>
     `;
     await this.mailer.sendMail({
+      companyId,
       from: fromAddress,
       to: customerEmail,
       subject,

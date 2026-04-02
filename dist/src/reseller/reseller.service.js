@@ -49,6 +49,7 @@ let ResellerService = class ResellerService {
             ? Number(reseller.resellerCommissionRate)
             : 0;
         const totalCommission = (totalRevenue * commissionRate) / 100;
+        const resellerNetEarning = totalRevenue - totalCommission;
         const paidPayouts = await this.payoutRepo
             .createQueryBuilder('payout')
             .select('COALESCE(SUM(payout.amount), 0)', 'paid')
@@ -58,15 +59,17 @@ let ResellerService = class ResellerService {
             status: reseller_payout_entity_1.ResellerPayoutStatus.PAID,
         })
             .getRawOne();
-        const totalPaid = Number(paidPayouts?.paid ?? 0);
-        const pendingPayoutAmount = Math.max(totalCommission - totalPaid, 0);
+        const totalPaidToReseller = Number(paidPayouts?.paid ?? 0);
+        const pendingPayoutAmount = Math.max(resellerNetEarning, 0);
         return {
             totalProducts,
             totalSoldQty,
             totalEarning: totalRevenue,
             commissionRate,
             totalCommission,
+            resellerNetEarning,
             pendingPayoutAmount,
+            totalWithdrawn: totalPaidToReseller,
         };
     }
     async listPayouts(resellerId, companyId) {
@@ -100,7 +103,40 @@ let ResellerService = class ResellerService {
             status: reseller_payout_entity_1.ResellerPayoutStatus.PENDING,
             paymentDetails: dto.paymentDetails.trim(),
         });
-        return this.payoutRepo.save(payout);
+        const saved = await this.payoutRepo.save(payout);
+        try {
+            const reseller = await this.systemUserRepo.findOne({
+                where: { id: resellerId },
+            });
+            const adminEmail = this.configService.get('RESELLER_ADMIN_EMAIL') ||
+                'xinxo.shop@gmail.com';
+            if (adminEmail) {
+                const amount = Number(saved.amount).toFixed(2);
+                const html = `
+          <p>Dear Admin,</p>
+          <p>A reseller has submitted a <strong>new withdrawal request</strong> that requires your review.</p>
+          <p><strong>Details:</strong></p>
+          <ul>
+            <li><strong>Reseller:</strong> ${reseller?.name ?? 'N/A'} (${reseller?.email ?? 'N/A'})</li>
+            <li><strong>Payout ID:</strong> ${saved.id}</li>
+            <li><strong>Amount:</strong> ${amount}</li>
+            <li><strong>Payment details provided by reseller:</strong></li>
+          </ul>
+          <pre>${saved.paymentDetails}</pre>
+          <p>Please log in to the admin panel, go to <strong>Resellers</strong>, expand this reseller's payouts, and click <strong>Mark as Paid</strong> once you have transferred the amount.</p>
+        `;
+                await this.mailer.sendMail({
+                    companyId,
+                    to: adminEmail,
+                    subject: 'New reseller withdrawal request submitted',
+                    html,
+                });
+            }
+        }
+        catch (error) {
+            console.error('Failed to send admin withdrawal notification:', error);
+        }
+        return saved;
     }
     async adminCreatePayout(resellerId, companyId, dto) {
         const sevenDaysAgo = new Date();
@@ -160,6 +196,7 @@ let ResellerService = class ResellerService {
           <p><a href="${loginUrl}">${loginUrl}</a></p>
         `;
                 await this.mailer.sendMail({
+                    companyId,
                     to: reseller.email,
                     subject: 'New commission payment request for your reseller account',
                     html,
@@ -216,6 +253,7 @@ let ResellerService = class ResellerService {
           </ul>
         `;
                 await this.mailer.sendMail({
+                    companyId,
                     to: adminEmail,
                     subject: 'Reseller commission payout marked as paid',
                     html,
@@ -251,6 +289,7 @@ let ResellerService = class ResellerService {
             payout.invoiceNumber = `RP-INV-${payout.companyId}-${id}-${yyyy}${mm}${dd}`;
         }
         const saved = await this.payoutRepo.save(payout);
+        await this.productRepo.update({ resellerId: saved.resellerId, companyId: saved.companyId }, { sold: 0, totalIncome: 0 });
         try {
             const reseller = await this.systemUserRepo.findOne({
                 where: { id: saved.resellerId },
@@ -276,6 +315,7 @@ let ResellerService = class ResellerService {
           <p><a href="${loginUrl}">${loginUrl}</a></p>
         `;
                 await this.mailer.sendMail({
+                    companyId: saved.companyId,
                     to: reseller.email,
                     subject: 'Your reseller payout has been paid',
                     html,
@@ -362,6 +402,7 @@ let ResellerService = class ResellerService {
                 commissionRate: summary.commissionRate,
                 totalCommission: summary.totalCommission,
                 pendingPayoutAmount: summary.pendingPayoutAmount,
+                totalWithdrawn: summary.totalWithdrawn,
                 payouts,
             };
         }));
@@ -392,6 +433,7 @@ let ResellerService = class ResellerService {
         <p>Your password was set by the store admin. If you don't know it yet, please contact them or use the password reset option on the login page.</p>
       `;
             await this.mailer.sendMail({
+                companyId: saved.companyId,
                 to: saved.email,
                 subject: 'Your reseller account is approved',
                 html,

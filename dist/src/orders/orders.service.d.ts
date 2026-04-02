@@ -29,6 +29,8 @@ export declare class OrderService {
         order: Order;
         payment: any;
     }>;
+    createIncomplete(createDto: CreateOrderDto, companyId: string, orderId?: number): Promise<Order>;
+    convertToRealOrder(id: number, companyId: string, performedByUserId?: number): Promise<Order>;
     findAll(companyId: string, resellerId?: number): Promise<Order[]>;
     getStats(companyId: string): Promise<{
         total: number;
@@ -39,13 +41,14 @@ export declare class OrderService {
         delivered: number;
         cancelled: number;
         refunded: number;
+        incomplete: number;
         totalRevenue: number;
         unpaidCount: number;
     }>;
     findByCustomerId(customerId: number, companyId: string): Promise<Order[]>;
     findByTrackingId(trackingId: string): Promise<{
         orderId: number;
-        status: "pending" | "paid" | "cancelled" | "refunded" | "processing" | "shipped" | "delivered";
+        status: "pending" | "paid" | "cancelled" | "refunded" | "processing" | "shipped" | "delivered" | "incomplete";
         message: string;
         trackingId: string;
         shippingProvider: string;

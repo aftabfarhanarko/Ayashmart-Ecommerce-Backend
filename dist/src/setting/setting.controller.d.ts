@@ -3,6 +3,7 @@ import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { RequestContextService } from '../common/services/request-context.service';
 import { UpdateSmtpDto } from './dto/update-smtp.dto';
+import { UpdateFraudCheckerDto } from './dto/update-fraud-checker.dto';
 export declare class SettingController {
     private readonly settingService;
     private readonly requestContext;
@@ -21,6 +22,17 @@ export declare class SettingController {
         status: string;
         message: string;
         data: import("./entities/setting.entity").Setting;
+    }>;
+    upsertFraudCheckerApi(dto: UpdateFraudCheckerDto): Promise<{
+        status: string;
+        message: string;
+        data: import("./entities/setting.entity").Setting;
+    }>;
+    getFraudCheckerApi(): Promise<{
+        status: string;
+        data: {
+            fraudCheckerApiKey: string;
+        };
     }>;
     findOne(id: string): Promise<{
         status: string;

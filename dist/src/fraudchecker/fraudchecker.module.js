@@ -12,12 +12,13 @@ const fraudchecker_service_1 = require("./fraudchecker.service");
 const fraudchecker_controller_1 = require("./fraudchecker.controller");
 const users_module_1 = require("../users/users.module");
 const request_context_service_1 = require("../common/services/request-context.service");
+const setting_module_1 = require("../setting/setting.module");
 let FraudcheckerModule = class FraudcheckerModule {
 };
 exports.FraudcheckerModule = FraudcheckerModule;
 exports.FraudcheckerModule = FraudcheckerModule = __decorate([
     (0, common_1.Module)({
-        imports: [users_module_1.UsersModule],
+        imports: [users_module_1.UsersModule, setting_module_1.SettingModule],
         controllers: [fraudchecker_controller_1.FraudcheckerController],
         providers: [fraudchecker_service_1.FraudcheckerService, request_context_service_1.RequestContextService],
     })

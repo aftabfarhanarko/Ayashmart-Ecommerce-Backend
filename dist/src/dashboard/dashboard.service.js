@@ -20,13 +20,15 @@ const order_entity_1 = require("../orders/entities/order.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const product_entity_1 = require("../products/entities/product.entity");
 const category_entity_1 = require("../category/entities/category.entity");
+const cash_service_1 = require("../cash/cash.service");
 const axios_1 = require("axios");
 let DashboardService = class DashboardService {
-    constructor(orderRepo, userRepo, productRepo, categoryRepo) {
+    constructor(orderRepo, userRepo, productRepo, categoryRepo, cashService) {
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
+        this.cashService = cashService;
     }
     async getDashboardData(companyId) {
         try {
@@ -48,10 +50,11 @@ let DashboardService = class DashboardService {
             const customerStats = await this.getCustomerStats(companyId);
             const paidOrders = allOrders.filter((o) => o.isPaid || o.status === 'paid' || o.status === 'delivered');
             const totalRevenue = paidOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+            const cashSummary = await this.cashService.getSummary(companyId);
             const overviewMetrics = {
                 totalProducts: productStats.totalProducts,
                 totalSales: customerStats.totalOrders,
-                totalRevenue: Math.round(totalRevenue * 100) / 100,
+                totalRevenue: Math.round((totalRevenue + cashSummary.manualIncome - cashSummary.totalExpense) * 100) / 100,
                 totalStoreViews: customerStats.totalCustomers,
             };
             const recentProducts = await this.getRecentProducts(companyId, 15);
@@ -1096,6 +1099,7 @@ exports.DashboardService = DashboardService = __decorate([
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        cash_service_1.CashService])
 ], DashboardService);
 //# sourceMappingURL=dashboard.service.js.map

@@ -3,12 +3,14 @@ import { Order } from '../orders/entities/order.entity';
 import { User } from '../users/entities/user.entity';
 import { ProductEntity } from '../products/entities/product.entity';
 import { CategoryEntity } from '../category/entities/category.entity';
+import { CashService } from '../cash/cash.service';
 export declare class DashboardService {
     private orderRepo;
     private userRepo;
     private productRepo;
     private categoryRepo;
-    constructor(orderRepo: Repository<Order>, userRepo: Repository<User>, productRepo: Repository<ProductEntity>, categoryRepo: Repository<CategoryEntity>);
+    private cashService;
+    constructor(orderRepo: Repository<Order>, userRepo: Repository<User>, productRepo: Repository<ProductEntity>, categoryRepo: Repository<CategoryEntity>, cashService: CashService);
     getDashboardData(companyId: string): Promise<{
         stats: {
             title: string;

@@ -144,6 +144,17 @@ export declare class ProductController {
         message: string;
         data: import("./entities/product.entity").ProductEntity;
     }>;
+    rejectProduct(id: number, companyId: string, body: {
+        reason?: string;
+    }): Promise<{
+        statusCode: HttpStatus;
+        message: string;
+        data: import("./entities/product.entity").ProductEntity;
+    }>;
+    getPendingApproval(companyId: string): Promise<{
+        statusCode: HttpStatus;
+        data: any[];
+    }>;
     permanentDelete(id: number, companyId: string, req?: any): Promise<{
         statusCode: HttpStatus;
         message: string;

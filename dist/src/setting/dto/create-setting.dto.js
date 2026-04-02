@@ -54,4 +54,10 @@ __decorate([
     (0, class_validator_1.MaxLength)(255),
     __metadata("design:type", String)
 ], CreateSettingDto.prototype, "smtpPass", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(500),
+    __metadata("design:type", String)
+], CreateSettingDto.prototype, "fraudCheckerApiKey", void 0);
 //# sourceMappingURL=create-setting.dto.js.map

@@ -48,6 +48,8 @@ export declare class ProductService {
     permanentDelete(id: number, companyId: string, performedByUserId?: number): Promise<void>;
     autoDeleteOldTrash(): Promise<number>;
     publishDraft(id: number, companyId: string): Promise<ProductEntity>;
+    rejectProduct(id: number, companyId: string, reason?: string): Promise<ProductEntity>;
+    getPendingApprovalProducts(companyId: string): Promise<any[]>;
     toggleActive(id: number, active: boolean, companyId: string): Promise<ProductEntity>;
     findTrending(companyId: string, days?: number, limit?: number): Promise<ProductEntity[]>;
     setFlashSell(productIds: number[], flashSellStartTime: Date, flashSellEndTime: Date, flashSellPrice: number | undefined, companyId: string): Promise<ProductEntity[]>;

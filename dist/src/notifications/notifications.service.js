@@ -41,6 +41,7 @@ let NotificationsService = class NotificationsService {
         const results = await Promise.allSettled(recipients.map((user) => {
             const personalizedBody = dto.body.replace(/{{\s*name\s*}}/gi, user.name ?? 'there');
             return this.mailer.sendMail({
+                companyId,
                 from: fromAddress,
                 to: user.email,
                 subject: dto.subject,
@@ -103,6 +104,7 @@ let NotificationsService = class NotificationsService {
         try {
             const fromAddress = process.env.SMTP_FROM ?? process.env.SMTP_USER;
             const info = await this.mailer.sendMail({
+                companyId,
                 from: fromAddress,
                 to: ownerEmail,
                 subject,

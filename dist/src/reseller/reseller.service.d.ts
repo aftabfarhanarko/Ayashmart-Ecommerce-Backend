@@ -21,7 +21,9 @@ export declare class ResellerService {
         totalEarning: number;
         commissionRate: number;
         totalCommission: number;
+        resellerNetEarning: number;
         pendingPayoutAmount: number;
+        totalWithdrawn: number;
     }>;
     listPayouts(resellerId: number, companyId: string): Promise<ResellerPayout[]>;
     requestPayout(resellerId: number, companyId: string, dto: RequestPayoutDto): Promise<ResellerPayout>;
@@ -64,6 +66,7 @@ export declare class ResellerService {
         commissionRate: number;
         totalCommission: number;
         pendingPayoutAmount: number;
+        totalWithdrawn: number;
         payouts: ResellerPayout[];
     }[]>;
     approveReseller(id: number): Promise<SystemUser>;

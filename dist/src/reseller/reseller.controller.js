@@ -68,22 +68,6 @@ let ResellerController = class ResellerController {
             data,
         };
     }
-    async resellerMarkPayoutPaid(id, companyId, req) {
-        const { userId, sub, role } = req.user || {};
-        if (role !== system_user_role_enum_1.SystemUserRole.RESELLER) {
-            return {
-                statusCode: common_1.HttpStatus.FORBIDDEN,
-                message: 'Only resellers can mark payouts paid',
-            };
-        }
-        const resellerId = +(userId || sub);
-        const data = await this.resellerService.resellerMarkPayoutPaid(id, resellerId, companyId);
-        return {
-            statusCode: common_1.HttpStatus.OK,
-            message: 'Payout marked as paid',
-            data,
-        };
-    }
     async requestPayout(companyId, req, body) {
         const { userId, sub, role } = req.user || {};
         if (role !== system_user_role_enum_1.SystemUserRole.RESELLER) {
@@ -97,22 +81,6 @@ let ResellerController = class ResellerController {
         return {
             statusCode: common_1.HttpStatus.CREATED,
             message: 'Payout request created',
-            data,
-        };
-    }
-    async adminCreatePayout(id, companyId, req, body) {
-        const { role } = req.user || {};
-        if (role !== system_user_role_enum_1.SystemUserRole.SYSTEM_OWNER &&
-            role !== system_user_role_enum_1.SystemUserRole.SUPER_ADMIN) {
-            return {
-                statusCode: common_1.HttpStatus.FORBIDDEN,
-                message: 'Only system owners or super admins can create commission requests',
-            };
-        }
-        const data = await this.resellerService.adminCreatePayout(id, companyId, body);
-        return {
-            statusCode: common_1.HttpStatus.CREATED,
-            message: 'Commission request created for reseller',
             data,
         };
     }
@@ -237,15 +205,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ResellerController.prototype, "getPayoutInvoice", null);
 __decorate([
-    (0, common_1.Post)('payouts/:id/mark-paid'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
-    __param(1, (0, company_id_decorator_1.CompanyId)()),
-    __param(2, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, Object]),
-    __metadata("design:returntype", Promise)
-], ResellerController.prototype, "resellerMarkPayoutPaid", null);
-__decorate([
     (0, common_1.Post)('payouts/request'),
     __param(0, (0, company_id_decorator_1.CompanyId)()),
     __param(1, (0, common_1.Req)()),
@@ -254,16 +213,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, request_payout_dto_1.RequestPayoutDto]),
     __metadata("design:returntype", Promise)
 ], ResellerController.prototype, "requestPayout", null);
-__decorate([
-    (0, common_1.Post)('admin/resellers/:id/payouts'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
-    __param(1, (0, company_id_decorator_1.CompanyId)()),
-    __param(2, (0, common_1.Req)()),
-    __param(3, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, Object, request_payout_dto_1.RequestPayoutDto]),
-    __metadata("design:returntype", Promise)
-], ResellerController.prototype, "adminCreatePayout", null);
 __decorate([
     (0, common_1.Get)('admin/resellers'),
     __param(0, (0, company_id_decorator_1.CompanyId)()),

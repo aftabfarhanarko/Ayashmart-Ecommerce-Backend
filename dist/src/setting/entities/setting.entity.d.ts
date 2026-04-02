@@ -12,6 +12,7 @@ export declare class Setting {
     smtpUser?: string;
     smtpPass?: string;
     smtpFrom?: string;
+    fraudCheckerApiKey?: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;

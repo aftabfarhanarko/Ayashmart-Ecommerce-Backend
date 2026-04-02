@@ -342,7 +342,15 @@ let ProductController = class ProductController {
     }
     async publishDraft(id, companyId) {
         const product = await this.productService.publishDraft(id, companyId);
-        return { statusCode: common_1.HttpStatus.OK, message: "Product published", data: product };
+        return { statusCode: common_1.HttpStatus.OK, message: "Product approved and published", data: product };
+    }
+    async rejectProduct(id, companyId, body) {
+        const product = await this.productService.rejectProduct(id, companyId, body?.reason);
+        return { statusCode: common_1.HttpStatus.OK, message: "Product rejected", data: product };
+    }
+    async getPendingApproval(companyId) {
+        const products = await this.productService.getPendingApprovalProducts(companyId);
+        return { statusCode: common_1.HttpStatus.OK, data: products };
     }
     async permanentDelete(id, companyId, req) {
         const performedByUserId = req?.user?.role && ['SUPER_ADMIN', 'SYSTEM_OWNER', 'EMPLOYEE'].includes(req.user.role)
@@ -564,6 +572,22 @@ __decorate([
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "publishDraft", null);
+__decorate([
+    (0, common_1.Patch)(":id/reject"),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, company_id_decorator_1.CompanyId)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "rejectProduct", null);
+__decorate([
+    (0, common_1.Get)("pending-approval"),
+    __param(0, (0, company_id_decorator_1.CompanyId)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "getPendingApproval", null);
 __decorate([
     (0, common_1.Delete)(":id/permanent"),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),

@@ -11,6 +11,16 @@ export declare class OrderController {
             payment: any;
         };
     }>;
+    createIncomplete(dto: CreateOrderDto, companyIdFromQuery?: string, companyIdFromToken?: string, orderId?: string): Promise<{
+        statusCode: number;
+        message: string;
+        data: import("./entities/order.entity").Order;
+    }>;
+    convert(id: number, companyId: string, req?: any): Promise<{
+        statusCode: number;
+        message: string;
+        data: import("./entities/order.entity").Order;
+    }>;
     getMyOrders(userId: number, companyId: string): Promise<{
         statusCode: number;
         message: string;
@@ -36,6 +46,7 @@ export declare class OrderController {
             delivered: number;
             cancelled: number;
             refunded: number;
+            incomplete: number;
             totalRevenue: number;
             unpaidCount: number;
         };

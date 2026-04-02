@@ -71,5 +71,6 @@ var FeaturePermission;
     FeaturePermission["NOTIFICATION_SETTINGS"] = "NOTIFICATION_SETTINGS";
     FeaturePermission["THEME_MANAGEMENT"] = "THEME_MANAGEMENT";
     FeaturePermission["CUSTOM_DOMAIN"] = "CUSTOM_DOMAIN";
+    FeaturePermission["RESELLER_MANAGEMENT"] = "RESELLER_MANAGEMENT";
 })(FeaturePermission || (exports.FeaturePermission = FeaturePermission = {}));
 //# sourceMappingURL=feature-permission.enum.js.map

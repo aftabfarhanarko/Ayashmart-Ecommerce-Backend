@@ -13,10 +13,12 @@ exports.FraudcheckerService = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const request_context_service_1 = require("../common/services/request-context.service");
+const setting_service_1 = require("../setting/setting.service");
 let FraudcheckerService = class FraudcheckerService {
-    constructor(usersService, requestContextService) {
+    constructor(usersService, requestContextService, settingService) {
         this.usersService = usersService;
         this.requestContextService = requestContextService;
+        this.settingService = settingService;
     }
     async checkUserRisk(userId) {
         const companyId = this.requestContextService.getCompanyId();
@@ -83,11 +85,31 @@ let FraudcheckerService = class FraudcheckerService {
         const companyId = this.requestContextService.getCompanyId();
         return this.usersService.unban(userId, companyId);
     }
+    async checkByPhoneExternal(phone) {
+        const companyId = this.requestContextService.getCompanyId();
+        const apiKey = await this.settingService.getFraudCheckerApiKey(companyId);
+        const url = apiKey
+            ? `https://fraudchecker.link/api/search.php?phone=${encodeURIComponent(phone)}&api_key=${encodeURIComponent(apiKey)}`
+            : `https://fraudchecker.link/free-fraud-checker-bd/api/search.php?phone=${encodeURIComponent(phone)}`;
+        let res;
+        try {
+            res = await fetch(url);
+        }
+        catch (err) {
+            throw new common_1.BadGatewayException('Failed to reach fraudchecker.link API');
+        }
+        if (!res.ok) {
+            throw new common_1.BadGatewayException(`External API returned status ${res.status}`);
+        }
+        const json = await res.json();
+        return json;
+    }
 };
 exports.FraudcheckerService = FraudcheckerService;
 exports.FraudcheckerService = FraudcheckerService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        request_context_service_1.RequestContextService])
+        request_context_service_1.RequestContextService,
+        setting_service_1.SettingService])
 ], FraudcheckerService);
 //# sourceMappingURL=fraudchecker.service.js.map

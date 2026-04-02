@@ -155,6 +155,7 @@ export class ResellerService {
           <p>Please log in to the admin panel, go to <strong>Resellers</strong>, expand this reseller's payouts, and click <strong>Mark as Paid</strong> once you have transferred the amount.</p>
         `;
         await this.mailer.sendMail({
+          companyId,
           to: adminEmail,
           subject: 'New reseller withdrawal request submitted',
           html,
@@ -254,6 +255,7 @@ export class ResellerService {
         `;
 
         await this.mailer.sendMail({
+          companyId,
           to: reseller.email,
           subject: 'New commission payment request for your reseller account',
           html,
@@ -326,6 +328,7 @@ export class ResellerService {
         `;
 
         await this.mailer.sendMail({
+          companyId,
           to: adminEmail,
           subject: 'Reseller commission payout marked as paid',
           html,
@@ -403,6 +406,7 @@ export class ResellerService {
         `;
 
         await this.mailer.sendMail({
+          companyId: saved.companyId,
           to: reseller.email,
           subject: 'Your reseller payout has been paid',
           html,
@@ -544,6 +548,7 @@ export class ResellerService {
       `;
 
       await this.mailer.sendMail({
+        companyId: saved.companyId,
         to: saved.email,
         subject: 'Your reseller account is approved',
         html,

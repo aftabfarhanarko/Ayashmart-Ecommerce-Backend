@@ -7,7 +7,7 @@ export declare class TrackOrderController {
         message: string;
         data: {
             orderId: number;
-            status: "pending" | "paid" | "cancelled" | "refunded" | "processing" | "shipped" | "delivered";
+            status: "pending" | "paid" | "cancelled" | "refunded" | "processing" | "shipped" | "delivered" | "incomplete";
             message: string;
             trackingId: string;
             shippingProvider: string;

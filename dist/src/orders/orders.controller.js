@@ -36,6 +36,20 @@ let OrderController = class OrderController {
         const o = await this.orderService.create(dto, companyId, performedByUserId);
         return { statusCode: 201, message: "Order created", data: o };
     }
+    async createIncomplete(dto, companyIdFromQuery, companyIdFromToken, orderId) {
+        const companyId = companyIdFromQuery || companyIdFromToken;
+        if (!companyId) {
+            throw new common_1.BadRequestException('companyId is required');
+        }
+        const o = await this.orderService.createIncomplete(dto, companyId, orderId ? +orderId : undefined);
+        return { statusCode: 201, message: "Incomplete order saved", data: o };
+    }
+    async convert(id, companyId, req) {
+        const performedByUserId = req?.user?.role && ['SUPER_ADMIN', 'SYSTEM_OWNER', 'EMPLOYEE'].includes(req.user.role)
+            ? +(req.user.userId || req.user.sub) : undefined;
+        const o = await this.orderService.convertToRealOrder(id, companyId, performedByUserId);
+        return { statusCode: 200, message: "Order converted successfully", data: o };
+    }
     async getMyOrders(userId, companyId) {
         const o = await this.orderService.findByCustomerId(userId, companyId);
         return { statusCode: 200, message: 'User orders fetched', data: o };
@@ -136,6 +150,26 @@ __decorate([
     __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], OrderController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)("incomplete"),
+    (0, public_decorator_1.Public)(),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('companyId')),
+    __param(2, (0, company_id_decorator_1.CompanyId)()),
+    __param(3, (0, common_1.Query)('orderId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto, String, String, String]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "createIncomplete", null);
+__decorate([
+    (0, common_1.Patch)(":id/convert"),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, company_id_decorator_1.CompanyId)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "convert", null);
 __decorate([
     (0, common_1.Get)('my-orders'),
     __param(0, (0, user_id_decorator_1.UserId)()),

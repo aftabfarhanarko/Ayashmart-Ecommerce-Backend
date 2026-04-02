@@ -150,9 +150,14 @@ import { TopProductsModule } from './top-products/top-products.module';
               | undefined;
 
             try {
-              setting = await settingService.findFirstByCompanyId(
-                '__SUPERADMIN_SMTP__',
-              );
+              if (options?.companyId) {
+                setting = await settingService.findFirstByCompanyId(options.companyId);
+              }
+              if (!setting) {
+                setting = await settingService.findFirstByCompanyId(
+                  '__SUPERADMIN_SMTP__',
+                );
+              }
             } catch {
               try {
                 setting = await settingService.findFirst();

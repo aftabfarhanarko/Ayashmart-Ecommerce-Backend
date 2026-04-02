@@ -46,6 +46,13 @@ let FraudcheckerController = class FraudcheckerController {
         const unbanned = await this.fraudcheckerService.unflagUser(id);
         return { statusCode: common_1.HttpStatus.OK, message: 'User unflagged (unbanned)', data: unbanned };
     }
+    async checkExternal(phone) {
+        if (!phone || phone.trim() === '') {
+            throw new common_1.BadRequestException('phone query parameter is required');
+        }
+        const result = await this.fraudcheckerService.checkByPhoneExternal(phone.trim());
+        return { statusCode: common_1.HttpStatus.OK, message: 'External fraud check completed', data: result };
+    }
 };
 exports.FraudcheckerController = FraudcheckerController;
 __decorate([
@@ -75,6 +82,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], FraudcheckerController.prototype, "unflagUser", null);
+__decorate([
+    (0, common_1.Get)('external/check'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Query)('phone')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], FraudcheckerController.prototype, "checkExternal", null);
 exports.FraudcheckerController = FraudcheckerController = __decorate([
     (0, common_1.Controller)('fraudchecker'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, company_id_guard_1.CompanyIdGuard),

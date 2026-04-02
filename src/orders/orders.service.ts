@@ -1131,6 +1131,7 @@ export class OrderService {
       }
 
       const info = await this.mailer.sendMail({
+        companyId: product.companyId,
         from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
         to: adminEmail,
         subject: `Low Stock Alert: ${productName} (${sku})`,
@@ -1229,6 +1230,7 @@ export class OrderService {
       }
 
       await this.mailer.sendMail({
+        companyId: order.companyId,
         from: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@innowavecart.com",
         to: email,
         subject,

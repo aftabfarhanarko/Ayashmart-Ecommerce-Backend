@@ -15,6 +15,7 @@ const order_entity_1 = require("../orders/entities/order.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const product_entity_1 = require("../products/entities/product.entity");
 const category_entity_1 = require("../category/entities/category.entity");
+const cash_module_1 = require("../cash/cash.module");
 let DashboardModule = class DashboardModule {
 };
 exports.DashboardModule = DashboardModule;
@@ -27,6 +28,7 @@ exports.DashboardModule = DashboardModule = __decorate([
                 product_entity_1.ProductEntity,
                 category_entity_1.CategoryEntity,
             ]),
+            cash_module_1.CashModule,
         ],
         controllers: [dashboard_controller_1.DashboardController],
         providers: [dashboard_service_1.DashboardService],

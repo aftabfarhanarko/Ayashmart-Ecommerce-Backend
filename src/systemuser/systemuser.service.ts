@@ -61,6 +61,7 @@ export class SystemuserService {
       const subjectPrefix = displayCompany ? `${displayCompany} - ` : '';
 
       await this.mailer.sendMail({
+        companyId: user.companyId,
         to: user.email,
         subject: `${subjectPrefix}Password Updated Successfully`,
         html,
@@ -90,6 +91,7 @@ export class SystemuserService {
       `;
 
       await this.mailer.sendMail({
+        companyId: user.companyId,
         to: adminEmail,
         subject: `${subjectPrefix}New reseller account pending approval`,
         html,
@@ -107,6 +109,7 @@ export class SystemuserService {
       const subjectPrefix = displayCompany ? `Welcome to ${displayCompany} - ` : 'Welcome - ';
 
       await this.mailer.sendMail({
+        companyId: user.companyId,
         to: user.email,
         subject: `${subjectPrefix}Your Account Credentials`,
         html,
@@ -147,6 +150,7 @@ export class SystemuserService {
       const displayCompany: string | undefined = (user as any)?.companyName;
       const subjectPrefix = displayCompany ? `${displayCompany} - ` : '';
       await this.mailer.sendMail({
+        companyId: user.companyId,
         to: user.email,
         subject: `${subjectPrefix}Your Store is Ready (Login & Subdomain)`,
         html,
@@ -824,6 +828,7 @@ export class SystemuserService {
         `;
 
         await this.mailer.sendMail({
+          companyId: updatedUser.companyId,
           to: updatedUser.email,
           subject,
           html,
@@ -1208,6 +1213,7 @@ export class SystemuserService {
       const subjectPrefix = displayCompany ? `${displayCompany} - ` : '';
 
       await this.mailer.sendMail({
+        companyId: user.companyId,
         to: user.email,
         subject: `${subjectPrefix}Password Reset Request`,
         html,

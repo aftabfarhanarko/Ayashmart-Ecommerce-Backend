@@ -67,6 +67,10 @@ __decorate([
     __metadata("design:type", String)
 ], Setting.prototype, "smtpFrom", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: true, length: 500 }),
+    __metadata("design:type", String)
+], Setting.prototype, "fraudCheckerApiKey", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Setting.prototype, "createdAt", void 0);

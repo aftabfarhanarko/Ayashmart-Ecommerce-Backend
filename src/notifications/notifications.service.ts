@@ -43,6 +43,7 @@ export class NotificationsService {
             recipients.map((user) => {
                 const personalizedBody = dto.body.replace(/{{\s*name\s*}}/gi, user.name ?? 'there');
                 return this.mailer.sendMail({
+                    companyId,
                     from: fromAddress,
                     to: user.email,
                     subject: dto.subject,
@@ -137,6 +138,7 @@ export class NotificationsService {
             const fromAddress = process.env.SMTP_FROM ?? process.env.SMTP_USER;
             
             const info = await this.mailer.sendMail({
+                companyId,
                 from: fromAddress,
                 to: ownerEmail,
                 subject,
