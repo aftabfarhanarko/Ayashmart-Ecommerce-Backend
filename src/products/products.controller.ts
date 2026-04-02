@@ -523,7 +523,23 @@ export class ProductController {
   @Patch(":id/publish")
   async publishDraft(@Param("id", ParseIntPipe) id: number, @CompanyId() companyId: string) {
     const product = await this.productService.publishDraft(id, companyId);
-    return { statusCode: HttpStatus.OK, message: "Product published", data: product };
+    return { statusCode: HttpStatus.OK, message: "Product approved and published", data: product };
+  }
+
+  @Patch(":id/reject")
+  async rejectProduct(
+    @Param("id", ParseIntPipe) id: number,
+    @CompanyId() companyId: string,
+    @Body() body: { reason?: string },
+  ) {
+    const product = await this.productService.rejectProduct(id, companyId, body?.reason);
+    return { statusCode: HttpStatus.OK, message: "Product rejected", data: product };
+  }
+
+  @Get("pending-approval")
+  async getPendingApproval(@CompanyId() companyId: string) {
+    const products = await this.productService.getPendingApprovalProducts(companyId);
+    return { statusCode: HttpStatus.OK, data: products };
   }
 
   @Delete(":id/permanent")

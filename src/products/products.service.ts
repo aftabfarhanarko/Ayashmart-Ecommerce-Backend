@@ -79,7 +79,7 @@ export class ProductService {
         discountPrice: createDto.discountPrice,
         category,
         isActive: createDto.isActive ?? true,
-        status: createDto.status || 'published',
+        status: resellerId ? 'draft' : (createDto.status || 'published'),
         description: createDto.description,
         images: createDto.images,
         thumbnail: createDto.thumbnail,
@@ -779,6 +779,52 @@ export class ProductService {
     const saved = await this.productRepository.save(product);
     await this.clearCache(companyId);
     return saved;
+  }
+
+  async rejectProduct(id: number, companyId: string, reason?: string): Promise<ProductEntity> {
+    const product = await this.productRepository.findOne({
+      where: { id, companyId, deletedAt: IsNull() },
+    });
+    if (!product) throw new NotFoundException("Product not found");
+    if (product.status !== 'draft') throw new BadRequestException("Only pending (draft) products can be rejected");
+
+    product.status = 'trashed';
+    product.deletedAt = new Date();
+    const saved = await this.productRepository.save(product);
+    await this.clearCache(companyId);
+    return saved;
+  }
+
+  /** Returns only reseller-submitted drafts (pending admin approval), with reseller info. */
+  async getPendingApprovalProducts(companyId: string): Promise<any[]> {
+    const rows = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoin('system_users', 'reseller', 'reseller.id = product.resellerId')
+      .addSelect(['reseller.id', 'reseller.name', 'reseller.email', 'reseller.phone', 'reseller.photo'])
+      .where('product.companyId = :companyId', { companyId })
+      .andWhere('product.status = :status', { status: 'draft' })
+      .andWhere('product.resellerId IS NOT NULL')
+      .andWhere('product.deletedAt IS NULL')
+      .orderBy('product.createdAt', 'DESC')
+      .getRawAndEntities();
+
+    // Merge raw reseller fields into entity results
+    return rows.entities.map((product, i) => {
+      const raw = rows.raw[i];
+      return {
+        ...product,
+        reseller: raw.reseller_name
+          ? {
+              id: raw.reseller_id,
+              name: raw.reseller_name,
+              email: raw.reseller_email,
+              phone: raw.reseller_phone,
+              photo: raw.reseller_photo,
+            }
+          : null,
+      };
+    });
   }
 
   async toggleActive(id: number, active: boolean, companyId: string): Promise<ProductEntity> {

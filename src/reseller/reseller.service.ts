@@ -51,10 +51,13 @@ export class ResellerService {
         ? Number(reseller.resellerCommissionRate)
         : 0;
 
-    // Admin commission is a percentage of reseller product revenue
+    // Admin takes commissionRate% from reseller's total revenue
     const totalCommission = (totalRevenue * commissionRate) / 100;
 
-    // Sum of commissions that have already been settled via payouts
+    // Reseller's net earning = total revenue minus admin commission
+    const resellerNetEarning = totalRevenue - totalCommission;
+
+    // Sum of payouts already paid TO the reseller by admin
     const paidPayouts = await this.payoutRepo
       .createQueryBuilder('payout')
       .select('COALESCE(SUM(payout.amount), 0)', 'paid')
@@ -65,20 +68,21 @@ export class ResellerService {
       })
       .getRawOne<{ paid: string }>();
 
-    const totalPaid = Number(paidPayouts?.paid ?? 0);
+    const totalPaidToReseller = Number(paidPayouts?.paid ?? 0);
 
-    // Amount of commission still due from reseller to admin
-    const pendingPayoutAmount = Math.max(totalCommission - totalPaid, 0);
+    // Since total sales are reset to 0 after every payout, totalRevenue only reflects the current unpaid cycle.
+    // Therefore, pendingPayoutAmount is exactly the resellerNetEarning of the current cycle.
+    const pendingPayoutAmount = Math.max(resellerNetEarning, 0);
 
     return {
       totalProducts,
       totalSoldQty,
-      // Keep existing field for compatibility, but now it represents total revenue
       totalEarning: totalRevenue,
-      // Expose explicit commission numbers so UI can show admin commission clearly
       commissionRate,
       totalCommission,
+      resellerNetEarning,
       pendingPayoutAmount,
+      totalWithdrawn: totalPaidToReseller,
     };
   }
 
@@ -125,7 +129,42 @@ export class ResellerService {
       paymentDetails: dto.paymentDetails.trim(),
     });
 
-    return this.payoutRepo.save(payout);
+    const saved = await this.payoutRepo.save(payout);
+
+    // Notify admin that reseller has submitted a withdrawal request
+    try {
+      const reseller = await this.systemUserRepo.findOne({
+        where: { id: resellerId },
+      });
+      const adminEmail =
+        this.configService.get<string>('RESELLER_ADMIN_EMAIL') ||
+        'xinxo.shop@gmail.com';
+      if (adminEmail) {
+        const amount = Number(saved.amount).toFixed(2);
+        const html = `
+          <p>Dear Admin,</p>
+          <p>A reseller has submitted a <strong>new withdrawal request</strong> that requires your review.</p>
+          <p><strong>Details:</strong></p>
+          <ul>
+            <li><strong>Reseller:</strong> ${reseller?.name ?? 'N/A'} (${reseller?.email ?? 'N/A'})</li>
+            <li><strong>Payout ID:</strong> ${saved.id}</li>
+            <li><strong>Amount:</strong> ${amount}</li>
+            <li><strong>Payment details provided by reseller:</strong></li>
+          </ul>
+          <pre>${saved.paymentDetails}</pre>
+          <p>Please log in to the admin panel, go to <strong>Resellers</strong>, expand this reseller's payouts, and click <strong>Mark as Paid</strong> once you have transferred the amount.</p>
+        `;
+        await this.mailer.sendMail({
+          to: adminEmail,
+          subject: 'New reseller withdrawal request submitted',
+          html,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to send admin withdrawal notification:', error);
+    }
+
+    return saved;
   }
 
   /**
@@ -328,6 +367,12 @@ export class ResellerService {
     }
     const saved = await this.payoutRepo.save(payout);
 
+    // Reset reseller's sales history upon successful payout
+    await this.productRepo.update(
+      { resellerId: saved.resellerId, companyId: saved.companyId },
+      { sold: 0, totalIncome: 0 }
+    );
+
     // Notify reseller by email (best-effort)
     try {
       const reseller = await this.systemUserRepo.findOne({
@@ -459,6 +504,7 @@ export class ResellerService {
           commissionRate: summary.commissionRate,
           totalCommission: summary.totalCommission,
           pendingPayoutAmount: summary.pendingPayoutAmount,
+          totalWithdrawn: summary.totalWithdrawn,
           payouts,
         };
       }),

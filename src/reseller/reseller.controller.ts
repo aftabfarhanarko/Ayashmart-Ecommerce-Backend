@@ -80,33 +80,6 @@ export class ResellerController {
     };
   }
 
-  /** Reseller: confirm that a commission payout has been paid to admin */
-  @Post('payouts/:id/mark-paid')
-  async resellerMarkPayoutPaid(
-    @Param('id', ParseIntPipe) id: number,
-    @CompanyId() companyId: string,
-    @Req() req: any,
-  ) {
-    const { userId, sub, role } = req.user || {};
-    if (role !== SystemUserRole.RESELLER) {
-      return {
-        statusCode: HttpStatus.FORBIDDEN,
-        message: 'Only resellers can mark payouts paid',
-      };
-    }
-    const resellerId = +(userId || sub);
-    const data = await this.resellerService.resellerMarkPayoutPaid(
-      id,
-      resellerId,
-      companyId,
-    );
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Payout marked as paid',
-      data,
-    };
-  }
-
   @Post('payouts/request')
   async requestPayout(
     @CompanyId() companyId: string,
@@ -129,32 +102,6 @@ export class ResellerController {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Payout request created',
-      data,
-    };
-  }
-
-  /** Admin: create a commission payout request for a specific reseller */
-  @Post('admin/resellers/:id/payouts')
-  async adminCreatePayout(
-    @Param('id', ParseIntPipe) id: number,
-    @CompanyId() companyId: string,
-    @Req() req: any,
-    @Body() body: RequestPayoutDto,
-  ) {
-    const { role } = req.user || {};
-    if (
-      role !== SystemUserRole.SYSTEM_OWNER &&
-      role !== SystemUserRole.SUPER_ADMIN
-    ) {
-      return {
-        statusCode: HttpStatus.FORBIDDEN,
-        message: 'Only system owners or super admins can create commission requests',
-      };
-    }
-    const data = await this.resellerService.adminCreatePayout(id, companyId, body);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'Commission request created for reseller',
       data,
     };
   }
