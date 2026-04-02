@@ -9,6 +9,12 @@ export class PathaoConfigDto {
   @IsOptional()
   @IsString()
   clientSecret?: string;
+  @IsOptional()
+  @IsString()
+  username?: string;
+  @IsOptional()
+  @IsString()
+  password?: string;
 }
 
 export class SteadfastConfigDto {

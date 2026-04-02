@@ -139,6 +139,8 @@ export class SystemUser {
   pathaoConfig: {
     clientId?: string;
     clientSecret?: string;
+    username?: string;
+    password?: string;
   };
 
   @Column('json', { nullable: true })
