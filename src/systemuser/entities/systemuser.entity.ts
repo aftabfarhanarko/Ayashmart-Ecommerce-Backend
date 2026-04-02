@@ -179,10 +179,10 @@ export class SystemUser {
   @Column('decimal', { precision: 5, scale: 2, nullable: true })
   resellerCommissionRate?: number | null;
 
-  @Column({ type: 'int', default: 0, nullable: false })
+  @Column({ type: 'int', default: 0, nullable: true })
   paidTotalSoldQty: number;
 
-  @Column('decimal', { precision: 12, scale: 2, default: 0, nullable: false })
+  @Column('decimal', { precision: 12, scale: 2, default: 0, nullable: true })
   paidTotalEarning: number;
 
   @CreateDateColumn()
