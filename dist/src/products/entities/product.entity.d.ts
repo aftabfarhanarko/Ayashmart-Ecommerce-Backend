@@ -13,7 +13,7 @@ export declare class ProductEntity {
     }[];
     thumbnail?: string;
     isActive: boolean;
-    status: 'draft' | 'published' | 'trashed';
+    status: 'draft' | 'published' | 'trashed' | 'pending';
     isFlashSell: boolean;
     flashSellStartTime?: Date;
     flashSellEndTime?: Date;

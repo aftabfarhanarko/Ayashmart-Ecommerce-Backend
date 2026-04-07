@@ -73,7 +73,7 @@ let ProductService = class ProductService {
                 discountPrice: createDto.discountPrice,
                 category,
                 isActive: createDto.isActive ?? true,
-                status: resellerId ? 'draft' : (createDto.status || 'published'),
+                status: resellerId ? 'pending' : (createDto.status || 'published'),
                 description: createDto.description,
                 images: createDto.images,
                 thumbnail: createDto.thumbnail,
@@ -147,20 +147,33 @@ let ProductService = class ProductService {
         catch (e) {
             console.error('Cache get error:', e);
         }
-        const relations = options?.relations || ["category"];
-        const where = { deletedAt: (0, typeorm_2.IsNull)(), companyId };
-        if (options?.status) {
-            where.status = options.status;
-        }
-        else {
-            where.status = 'published';
-        }
+        const statusFilter = options?.status || 'published';
+        const qb = this.productRepository
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoin('system_users', 'reseller', 'reseller.id = product.resellerId')
+            .addSelect(['reseller.id', 'reseller.name', 'reseller.email', 'reseller.photo'])
+            .where('product.companyId = :companyId', { companyId })
+            .andWhere('product.status = :status', { status: statusFilter })
+            .andWhere('product.deletedAt IS NULL')
+            .orderBy('product.createdAt', 'DESC');
         if (options?.resellerId) {
-            where.resellerId = options.resellerId;
+            qb.andWhere('product.resellerId = :resellerId', { resellerId: options.resellerId });
         }
-        const result = await this.productRepository.find({
-            where,
-            relations: relations.includes("category") ? relations : [...relations, "category"],
+        const rows = await qb.getRawAndEntities();
+        const result = rows.entities.map((product, i) => {
+            const raw = rows.raw[i];
+            return {
+                ...product,
+                reseller: raw.reseller_id
+                    ? {
+                        id: raw.reseller_id,
+                        name: raw.reseller_name,
+                        email: raw.reseller_email,
+                        photo: raw.reseller_photo,
+                    }
+                    : null,
+            };
         });
         try {
             await this.cacheManager.set(cacheKey, result, 300 * 1000);
@@ -586,14 +599,25 @@ let ProductService = class ProductService {
         });
     }
     async getDraftProducts(companyId, resellerId) {
+        if (resellerId) {
+            const rows = await this.productRepository
+                .createQueryBuilder('product')
+                .leftJoinAndSelect('product.category', 'category')
+                .where('product.companyId = :companyId', { companyId })
+                .andWhere('product.status IN (:...statuses)', { statuses: ['draft', 'pending'] })
+                .andWhere('product.resellerId = :resellerId', { resellerId })
+                .andWhere('product.deletedAt IS NULL')
+                .orderBy('product.createdAt', 'DESC')
+                .getMany();
+            return rows;
+        }
         return this.productRepository.find({
             where: {
                 status: 'draft',
                 deletedAt: (0, typeorm_2.IsNull)(),
                 companyId,
-                ...(resellerId ? { resellerId } : {}),
             },
-            relations: ["category"],
+            relations: ['category'],
         });
     }
     async recoverFromTrash(id, companyId) {
@@ -672,8 +696,8 @@ let ProductService = class ProductService {
         });
         if (!product)
             throw new common_1.NotFoundException("Product not found");
-        if (product.status !== 'draft') {
-            throw new common_1.BadRequestException("Product is not a draft");
+        if (product.status !== 'draft' && product.status !== 'pending') {
+            throw new common_1.BadRequestException("Product is not a draft or pending approval");
         }
         product.status = 'published';
         const saved = await this.productRepository.save(product);
@@ -686,8 +710,9 @@ let ProductService = class ProductService {
         });
         if (!product)
             throw new common_1.NotFoundException("Product not found");
-        if (product.status !== 'draft')
-            throw new common_1.BadRequestException("Only pending (draft) products can be rejected");
+        if (product.status !== 'draft' && product.status !== 'pending') {
+            throw new common_1.BadRequestException("Only draft or pending products can be rejected");
+        }
         product.status = 'trashed';
         product.deletedAt = new Date();
         const saved = await this.productRepository.save(product);
@@ -701,7 +726,7 @@ let ProductService = class ProductService {
             .leftJoin('system_users', 'reseller', 'reseller.id = product.resellerId')
             .addSelect(['reseller.id', 'reseller.name', 'reseller.email', 'reseller.phone', 'reseller.photo'])
             .where('product.companyId = :companyId', { companyId })
-            .andWhere('product.status = :status', { status: 'draft' })
+            .andWhere('product.status = :status', { status: 'pending' })
             .andWhere('product.resellerId IS NOT NULL')
             .andWhere('product.deletedAt IS NULL')
             .orderBy('product.createdAt', 'DESC')

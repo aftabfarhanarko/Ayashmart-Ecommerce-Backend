@@ -19,9 +19,9 @@ export declare class ProductService {
     create(createDto: CreateProductDto, companyId: string, performedByUserId?: number, resellerId?: number): Promise<ProductEntity>;
     findAll(companyId: string, options?: {
         relations?: string[];
-        status?: 'draft' | 'published' | 'trashed';
+        status?: 'draft' | 'published' | 'trashed' | 'pending';
         resellerId?: number;
-    }): Promise<ProductEntity[]>;
+    }): Promise<any[]>;
     findPublic(companyId: string, options?: {
         categorySlug?: string;
         limit?: number;
@@ -43,7 +43,7 @@ export declare class ProductService {
     update(id: number, updateDto: UpdateProductDto, companyId: string, performedByUserId?: number): Promise<ProductEntity>;
     softDelete(id: number, companyId: string, performedByUserId?: number): Promise<void>;
     getTrashedProducts(companyId: string, resellerId?: number): Promise<ProductEntity[]>;
-    getDraftProducts(companyId: string, resellerId?: number): Promise<ProductEntity[]>;
+    getDraftProducts(companyId: string, resellerId?: number): Promise<any[]>;
     recoverFromTrash(id: number, companyId: string): Promise<ProductEntity>;
     permanentDelete(id: number, companyId: string, performedByUserId?: number): Promise<void>;
     autoDeleteOldTrash(): Promise<number>;

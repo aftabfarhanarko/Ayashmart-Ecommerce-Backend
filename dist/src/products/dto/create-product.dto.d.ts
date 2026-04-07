@@ -6,7 +6,7 @@ export declare class CreateProductDto {
     discountPrice?: number;
     categoryId?: number;
     isActive?: boolean;
-    status?: 'draft' | 'published' | 'trashed';
+    status?: 'draft' | 'published' | 'trashed' | 'pending';
     description?: string;
     images?: ProductImageDto[];
     thumbnail?: string;

@@ -42,7 +42,9 @@ let ProductController = class ProductController {
             const performedByUserId = role && [system_user_role_enum_1.SystemUserRole.SUPER_ADMIN, system_user_role_enum_1.SystemUserRole.SYSTEM_OWNER, system_user_role_enum_1.SystemUserRole.EMPLOYEE].includes(role)
                 ? numericUserId
                 : undefined;
-            const resellerId = role === system_user_role_enum_1.SystemUserRole.RESELLER ? numericUserId : undefined;
+            const resellerId = (role === system_user_role_enum_1.SystemUserRole.RESELLER || role === 'MERCHANT')
+                ? numericUserId
+                : undefined;
             const product = await this.productService.create(createDto, companyId, performedByUserId, resellerId);
             return { statusCode: common_1.HttpStatus.CREATED, message: 'Product created', data: product };
         }
@@ -56,7 +58,7 @@ let ProductController = class ProductController {
     async findAll(companyId, status, resellerIdFromQuery, req) {
         const role = req?.user?.role;
         const numericUserId = +(req?.user?.userId || req?.user?.sub);
-        const resellerId = role === system_user_role_enum_1.SystemUserRole.RESELLER
+        const resellerId = (role === system_user_role_enum_1.SystemUserRole.RESELLER || role === 'MERCHANT')
             ? numericUserId
             : resellerIdFromQuery
                 ? +resellerIdFromQuery
@@ -78,7 +80,7 @@ let ProductController = class ProductController {
         }
         const role = req?.user?.role;
         const numericUserId = +(req?.user?.userId || req?.user?.sub);
-        const resellerId = role === system_user_role_enum_1.SystemUserRole.RESELLER
+        const resellerId = (role === system_user_role_enum_1.SystemUserRole.RESELLER || role === 'MERCHANT')
             ? numericUserId
             : resellerIdFromQuery
                 ? +resellerIdFromQuery
@@ -89,7 +91,7 @@ let ProductController = class ProductController {
     async getDrafts(companyId, resellerIdFromQuery, req) {
         const role = req?.user?.role;
         const numericUserId = +(req?.user?.userId || req?.user?.sub);
-        const resellerId = role === system_user_role_enum_1.SystemUserRole.RESELLER
+        const resellerId = (role === system_user_role_enum_1.SystemUserRole.RESELLER || role === 'MERCHANT')
             ? numericUserId
             : resellerIdFromQuery
                 ? +resellerIdFromQuery
@@ -100,7 +102,7 @@ let ProductController = class ProductController {
     async getTrash(companyId, resellerIdFromQuery, req) {
         const role = req?.user?.role;
         const numericUserId = +(req?.user?.userId || req?.user?.sub);
-        const resellerId = role === system_user_role_enum_1.SystemUserRole.RESELLER
+        const resellerId = (role === system_user_role_enum_1.SystemUserRole.RESELLER || role === 'MERCHANT')
             ? numericUserId
             : resellerIdFromQuery
                 ? +resellerIdFromQuery
@@ -299,6 +301,21 @@ let ProductController = class ProductController {
             throw new common_1.BadRequestException(`Failed to process file: ${error.message}`);
         }
     }
+    async getPendingApproval(companyId) {
+        const products = await this.productService.getPendingApprovalProducts(companyId);
+        return { statusCode: common_1.HttpStatus.OK, data: products };
+    }
+    async getActiveFlashSellProducts(companyIdFromQuery, companyIdFromToken) {
+        const companyId = companyIdFromQuery || companyIdFromToken;
+        if (!companyId) {
+            throw new common_1.BadRequestException('companyId is required');
+        }
+        const products = await this.productService.getActiveFlashSellProducts(companyId);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            data: products,
+        };
+    }
     async findOne(id, companyId) {
         const product = await this.productService.findOne(id, companyId);
         return { statusCode: common_1.HttpStatus.OK, data: product };
@@ -348,10 +365,6 @@ let ProductController = class ProductController {
         const product = await this.productService.rejectProduct(id, companyId, body?.reason);
         return { statusCode: common_1.HttpStatus.OK, message: "Product rejected", data: product };
     }
-    async getPendingApproval(companyId) {
-        const products = await this.productService.getPendingApprovalProducts(companyId);
-        return { statusCode: common_1.HttpStatus.OK, data: products };
-    }
     async permanentDelete(id, companyId, req) {
         const performedByUserId = req?.user?.role && ['SUPER_ADMIN', 'SYSTEM_OWNER', 'EMPLOYEE'].includes(req.user.role)
             ? +(req.user.userId || req.user.sub) : undefined;
@@ -362,17 +375,6 @@ let ProductController = class ProductController {
         const isActive = active === "true";
         const product = await this.productService.toggleActive(id, isActive, companyId);
         return { statusCode: common_1.HttpStatus.OK, message: `Product ${isActive ? "activated" : "disabled"}`, data: product };
-    }
-    async getActiveFlashSellProducts(companyIdFromQuery, companyIdFromToken) {
-        const companyId = companyIdFromQuery || companyIdFromToken;
-        if (!companyId) {
-            throw new common_1.BadRequestException('companyId is required');
-        }
-        const products = await this.productService.getActiveFlashSellProducts(companyId);
-        return {
-            statusCode: common_1.HttpStatus.OK,
-            data: products,
-        };
     }
 };
 exports.ProductController = ProductController;
@@ -513,6 +515,22 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "bulkUpload", null);
 __decorate([
+    (0, common_1.Get)('pending-approval'),
+    __param(0, (0, company_id_decorator_1.CompanyId)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "getPendingApproval", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('flash-sell/active'),
+    __param(0, (0, common_1.Query)('companyId')),
+    __param(1, (0, company_id_decorator_1.CompanyId)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "getActiveFlashSellProducts", null);
+__decorate([
     (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, company_id_decorator_1.CompanyId)()),
@@ -582,13 +600,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "rejectProduct", null);
 __decorate([
-    (0, common_1.Get)("pending-approval"),
-    __param(0, (0, company_id_decorator_1.CompanyId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ProductController.prototype, "getPendingApproval", null);
-__decorate([
     (0, common_1.Delete)(":id/permanent"),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, company_id_decorator_1.CompanyId)()),
@@ -606,15 +617,6 @@ __decorate([
     __metadata("design:paramtypes", [Number, String, String]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "toggleActive", null);
-__decorate([
-    (0, public_decorator_1.Public)(),
-    (0, common_1.Get)("flash-sell/active"),
-    __param(0, (0, common_1.Query)('companyId')),
-    __param(1, (0, company_id_decorator_1.CompanyId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", Promise)
-], ProductController.prototype, "getActiveFlashSellProducts", null);
 exports.ProductController = ProductController = __decorate([
     (0, common_1.Controller)('products'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, company_id_guard_1.CompanyIdGuard),

@@ -13,21 +13,21 @@ export declare class ProductController {
         message: string;
         data: import("./entities/product.entity").ProductEntity;
     }>;
-    findAll(companyId: string, status?: 'draft' | 'published' | 'trashed', resellerIdFromQuery?: string, req?: any): Promise<{
+    findAll(companyId: string, status?: 'draft' | 'published' | 'trashed' | 'pending', resellerIdFromQuery?: string, req?: any): Promise<{
         statusCode: HttpStatus;
-        data: import("./entities/product.entity").ProductEntity[];
+        data: any[];
     }>;
     findAllPublic(companyId: string): Promise<{
         statusCode: HttpStatus;
-        data: import("./entities/product.entity").ProductEntity[];
+        data: any[];
     }>;
-    findAllForAdmin(companyIdFromQuery: string, companyIdFromToken: string, status?: 'draft' | 'published' | 'trashed', resellerIdFromQuery?: string, req?: any): Promise<{
+    findAllForAdmin(companyIdFromQuery: string, companyIdFromToken: string, status?: 'draft' | 'published' | 'trashed' | 'pending', resellerIdFromQuery?: string, req?: any): Promise<{
         statusCode: HttpStatus;
-        data: import("./entities/product.entity").ProductEntity[];
+        data: any[];
     }>;
     getDrafts(companyId: string, resellerIdFromQuery?: string, req?: any): Promise<{
         statusCode: HttpStatus;
-        data: import("./entities/product.entity").ProductEntity[];
+        data: any[];
     }>;
     getTrash(companyId: string, resellerIdFromQuery?: string, req?: any): Promise<{
         statusCode: HttpStatus;
@@ -109,6 +109,14 @@ export declare class ProductController {
             };
         };
     }>;
+    getPendingApproval(companyId: string): Promise<{
+        statusCode: HttpStatus;
+        data: any[];
+    }>;
+    getActiveFlashSellProducts(companyIdFromQuery?: string, companyIdFromToken?: string): Promise<{
+        statusCode: HttpStatus;
+        data: import("./entities/product.entity").ProductEntity[];
+    }>;
     findOne(id: number, companyId: string): Promise<{
         statusCode: HttpStatus;
         data: import("./entities/product.entity").ProductEntity;
@@ -151,10 +159,6 @@ export declare class ProductController {
         message: string;
         data: import("./entities/product.entity").ProductEntity;
     }>;
-    getPendingApproval(companyId: string): Promise<{
-        statusCode: HttpStatus;
-        data: any[];
-    }>;
     permanentDelete(id: number, companyId: string, req?: any): Promise<{
         statusCode: HttpStatus;
         message: string;
@@ -163,9 +167,5 @@ export declare class ProductController {
         statusCode: HttpStatus;
         message: string;
         data: import("./entities/product.entity").ProductEntity;
-    }>;
-    getActiveFlashSellProducts(companyIdFromQuery?: string, companyIdFromToken?: string): Promise<{
-        statusCode: HttpStatus;
-        data: import("./entities/product.entity").ProductEntity[];
     }>;
 }

@@ -52,7 +52,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], ProductEntity.prototype, "isActive", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: ['draft', 'published', 'trashed'], default: 'published' }),
+    (0, typeorm_1.Column)({ type: 'enum', enum: ['draft', 'published', 'trashed', 'pending'], default: 'published' }),
     __metadata("design:type", String)
 ], ProductEntity.prototype, "status", void 0);
 __decorate([

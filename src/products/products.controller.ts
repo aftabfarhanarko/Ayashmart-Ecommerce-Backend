@@ -458,6 +458,29 @@ export class ProductController {
     }
   }
 
+  @Get('pending-approval')
+  async getPendingApproval(@CompanyId() companyId: string) {
+    const products = await this.productService.getPendingApprovalProducts(companyId);
+    return { statusCode: HttpStatus.OK, data: products };
+  }
+
+  @Public()
+  @Get('flash-sell/active')
+  async getActiveFlashSellProducts(
+    @Query('companyId') companyIdFromQuery?: string,
+    @CompanyId() companyIdFromToken?: string,
+  ) {
+    const companyId = companyIdFromQuery || companyIdFromToken;
+    if (!companyId) {
+      throw new BadRequestException('companyId is required');
+    }
+    const products = await this.productService.getActiveFlashSellProducts(companyId);
+    return {
+      statusCode: HttpStatus.OK,
+      data: products,
+    };
+  }
+
   @Get(":id")
   async findOne(@Param("id", ParseIntPipe) id: number, @CompanyId() companyId: string) {
     const product = await this.productService.findOne(id, companyId);
@@ -538,12 +561,6 @@ export class ProductController {
     return { statusCode: HttpStatus.OK, message: "Product rejected", data: product };
   }
 
-  @Get("pending-approval")
-  async getPendingApproval(@CompanyId() companyId: string) {
-    const products = await this.productService.getPendingApprovalProducts(companyId);
-    return { statusCode: HttpStatus.OK, data: products };
-  }
-
   @Delete(":id/permanent")
   async permanentDelete(@Param("id", ParseIntPipe) id: number, @CompanyId() companyId: string, @Req() req?: any) {
     const performedByUserId = req?.user?.role && ['SUPER_ADMIN', 'SYSTEM_OWNER', 'EMPLOYEE'].includes(req.user.role)
@@ -557,22 +574,5 @@ export class ProductController {
     const isActive = active === "true";
     const product = await this.productService.toggleActive(id, isActive, companyId);
     return { statusCode: HttpStatus.OK, message: `Product ${isActive ? "activated" : "disabled"}`, data: product };
-  }
-
-  @Public()
-  @Get("flash-sell/active")
-  async getActiveFlashSellProducts(
-    @Query('companyId') companyIdFromQuery?: string,
-    @CompanyId() companyIdFromToken?: string,
-  ) {
-    const companyId = companyIdFromQuery || companyIdFromToken;
-    if (!companyId) {
-      throw new BadRequestException('companyId is required');
-    }
-    const products = await this.productService.getActiveFlashSellProducts(companyId);
-    return {
-      statusCode: HttpStatus.OK,
-      data: products,
-    };
   }
 }
