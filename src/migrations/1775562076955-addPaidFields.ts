@@ -45,9 +45,13 @@ export class AddPaidFields1775562076955 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "tbl_products" ALTER COLUMN "status" SET DEFAULT 'published'`);
         await queryRunner.query(`DROP TYPE "public"."tbl_products_status_enum_old"`);
         await queryRunner.query(`ALTER TABLE "orders" ADD CONSTRAINT "FK_e5de51ca888d8b1f5ac25799dd1" FOREIGN KEY ("customerId") REFERENCES "tbl_users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "system_users" ADD IF NOT EXISTS "paidTotalSoldQty" integer NOT NULL DEFAULT '0'`);
+        await queryRunner.query(`ALTER TABLE "system_users" ADD IF NOT EXISTS "paidTotalEarning" numeric(12,2) NOT NULL DEFAULT '0'`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "system_users" DROP COLUMN IF EXISTS "paidTotalEarning"`);
+        await queryRunner.query(`ALTER TABLE "system_users" DROP COLUMN IF EXISTS "paidTotalSoldQty"`);
         await queryRunner.query(`ALTER TABLE "orders" DROP CONSTRAINT "FK_e5de51ca888d8b1f5ac25799dd1"`);
         await queryRunner.query(`CREATE TYPE "public"."tbl_products_status_enum_old" AS ENUM('draft', 'published', 'trashed')`);
         await queryRunner.query(`ALTER TABLE "tbl_products" ALTER COLUMN "status" DROP DEFAULT`);

@@ -61,11 +61,13 @@ import { VoiceModule } from './voice/voice.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       synchronize: true,
-      logging: true,
+      logging: false,
       ssl: {
         rejectUnauthorized: false,
       },
       autoLoadEntities: true,
+      migrations: [__dirname + '/migrations/*.{ts,js}'],
+      migrationsRun: true,
     }),
 
     TypeOrmModule.forFeature([SystemUser]),
