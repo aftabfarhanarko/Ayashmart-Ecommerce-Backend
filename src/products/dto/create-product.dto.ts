@@ -89,6 +89,11 @@ export class CreateProductDto {
   @IsOptional()
   @IsArray()
   variants?: { name: string }[];
+
+  // Product types (e.g. ["tshirt", "shirt"])
+  @IsOptional()
+  @IsArray()
+  types?: string[];
  
 
   // Shipping dimensions

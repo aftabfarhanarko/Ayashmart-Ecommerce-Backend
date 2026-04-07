@@ -101,6 +101,11 @@ export class UpdateProductDto {
   @IsArray()
   variants?: { name: string }[];
 
+  // Product types (e.g. ["tshirt", "shirt"])
+  @IsOptional()
+  @IsArray()
+  types?: string[];
+
   // Shipping dimensions
   @IsOptional()
   @IsNumber()
