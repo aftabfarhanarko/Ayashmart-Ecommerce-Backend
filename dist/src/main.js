@@ -27,7 +27,7 @@ async function bootstrap() {
 if (!process.env.VERCEL) {
     async function startLocalServer() {
         const app = await bootstrap();
-        const port = process.env.PORT || 5000;
+        const port = 5001;
         await app.listen(port);
         console.log(`🚀 Server is running on: http://localhost:${port}`);
     }

@@ -56,7 +56,9 @@ export class ProductController {
         role && [SystemUserRole.SUPER_ADMIN, SystemUserRole.SYSTEM_OWNER, SystemUserRole.EMPLOYEE].includes(role)
           ? numericUserId
           : undefined;
-      const resellerId = role === SystemUserRole.RESELLER ? numericUserId : undefined;
+      const resellerId = (role === SystemUserRole.RESELLER || (role as any) === 'MERCHANT')
+        ? numericUserId
+        : undefined;
 
       const product = await this.productService.create(
         createDto,
@@ -77,14 +79,14 @@ export class ProductController {
   @Get()
   async findAll(
     @Query('companyId') companyId: string,
-    @Query('status') status?: 'draft' | 'published' | 'trashed',
+    @Query('status') status?: 'draft' | 'published' | 'trashed' | 'pending',
     @Query('resellerId') resellerIdFromQuery?: string,
     @Req() req?: any,
   ) {
     const role: SystemUserRole | undefined = req?.user?.role;
     const numericUserId = +(req?.user?.userId || req?.user?.sub);
     const resellerId =
-      role === SystemUserRole.RESELLER
+      (role === SystemUserRole.RESELLER || (role as any) === 'MERCHANT')
         ? numericUserId
         : resellerIdFromQuery
           ? +resellerIdFromQuery
@@ -110,7 +112,7 @@ export class ProductController {
   async findAllForAdmin(
     @Query('companyId') companyIdFromQuery: string,
     @CompanyId() companyIdFromToken: string,
-    @Query('status') status?: 'draft' | 'published' | 'trashed',
+    @Query('status') status?: 'draft' | 'published' | 'trashed' | 'pending',
     @Query('resellerId') resellerIdFromQuery?: string,
     @Req() req?: any,
   ) {
@@ -121,7 +123,7 @@ export class ProductController {
     const role: SystemUserRole | undefined = req?.user?.role;
     const numericUserId = +(req?.user?.userId || req?.user?.sub);
     const resellerId =
-      role === SystemUserRole.RESELLER
+      (role === SystemUserRole.RESELLER || (role as any) === 'MERCHANT')
         ? numericUserId
         : resellerIdFromQuery
           ? +resellerIdFromQuery
@@ -140,7 +142,7 @@ export class ProductController {
     const role: SystemUserRole | undefined = req?.user?.role;
     const numericUserId = +(req?.user?.userId || req?.user?.sub);
     const resellerId =
-      role === SystemUserRole.RESELLER
+      (role === SystemUserRole.RESELLER || (role as any) === 'MERCHANT')
         ? numericUserId
         : resellerIdFromQuery
           ? +resellerIdFromQuery
@@ -159,7 +161,7 @@ export class ProductController {
     const role: SystemUserRole | undefined = req?.user?.role;
     const numericUserId = +(req?.user?.userId || req?.user?.sub);
     const resellerId =
-      role === SystemUserRole.RESELLER
+      (role === SystemUserRole.RESELLER || (role as any) === 'MERCHANT')
         ? numericUserId
         : resellerIdFromQuery
           ? +resellerIdFromQuery

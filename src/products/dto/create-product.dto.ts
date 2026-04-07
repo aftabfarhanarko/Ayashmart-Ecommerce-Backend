@@ -27,7 +27,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
-  status?: 'draft' | 'published' | 'trashed';
+  status?: 'draft' | 'published' | 'trashed' | 'pending';
 
   @IsOptional()
   @IsString()

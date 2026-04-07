@@ -31,8 +31,8 @@ export class ProductEntity {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ type: 'enum', enum: ['draft', 'published', 'trashed'], default: 'published' })
-  status: 'draft' | 'published' | 'trashed';
+  @Column({ type: 'enum', enum: ['draft', 'published', 'trashed', 'pending'], default: 'published' })
+  status: 'draft' | 'published' | 'trashed' | 'pending';
 
   @Column({ default: false })
   isFlashSell: boolean;

@@ -63,7 +63,7 @@ export class Order {
   @Column({ default: false })
   isPaid: boolean;
 
-  @Column({ nullable: false })
+  @Column({ default: '' })
   companyId: string;
 
   @Column({ default: "INSIDEDHAKA" })

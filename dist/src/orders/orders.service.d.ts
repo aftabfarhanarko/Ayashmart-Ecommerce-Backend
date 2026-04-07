@@ -5,6 +5,7 @@ import { CreateOrderDto } from "./dto/create-order.dto";
 import { ProductEntity } from "../products/entities/product.entity";
 import { User } from "../users/entities/user.entity";
 import { PaymentsService } from "../payments/payments.service";
+import { VoiceService } from "../voice/voice.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { ActivityLogService } from "../systemuser/activity-log.service";
 import { SystemuserService } from "../systemuser/systemuser.service";
@@ -19,11 +20,12 @@ export declare class OrderService {
     private readonly activityLogService;
     private readonly systemuserService;
     private readonly mailer;
+    private readonly voiceService;
     constructor(orderRepo: Repository<Order>, statusHistoryRepo: Repository<OrderStatusHistory>, productRepo: Repository<ProductEntity>, userRepo: Repository<User>, dataSource: DataSource, paymentsService: PaymentsService, notificationsService: NotificationsService, activityLogService: ActivityLogService, systemuserService: SystemuserService, mailer: {
         sendMail: (message: unknown) => Promise<{
             id?: string;
         }>;
-    });
+    }, voiceService: VoiceService);
     private addStatusHistory;
     create(createDto: CreateOrderDto, companyId: string, performedByUserId?: number): Promise<{
         order: Order;

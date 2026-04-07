@@ -10,12 +10,15 @@ import { ProductEntity } from '../products/entities/product.entity';
 import { User } from '../users/entities/user.entity';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { SystemuserModule } from '../systemuser/systemuser.module';
+import { VoiceModule } from '../voice/voice.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
     PaymentsModule,
     NotificationsModule,
     SystemuserModule,
+    forwardRef(() => VoiceModule),
     TypeOrmModule.forFeature([
       Order,
       OrderStatusHistory,

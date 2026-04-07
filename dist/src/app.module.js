@@ -49,6 +49,7 @@ const media_module_1 = require("./media/media.module");
 const reseller_module_1 = require("./reseller/reseller.module");
 const cash_module_1 = require("./cash/cash.module");
 const top_products_module_1 = require("./top-products/top-products.module");
+const voice_module_1 = require("./voice/voice.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -107,6 +108,7 @@ exports.AppModule = AppModule = __decorate([
             reseller_module_1.ResellerModule,
             top_products_module_1.TopProductsModule,
             cash_module_1.CashModule,
+            voice_module_1.VoiceModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

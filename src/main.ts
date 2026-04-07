@@ -21,10 +21,10 @@ async function bootstrap(): Promise<NestExpressApplication> {
         const app = await NestFactory.create<NestExpressApplication>(AppModule, {
             logger: ['error', 'warn'], // Optimize logging for production
         });
-  app.enableCors({
-  origin: true, // ✅ সব domain allow
-  credentials: false, // optional: cookie/credential নেই
-});
+        app.enableCors({
+            origin: true, // ✅ সব domain allow
+            credentials: false, // optional: cookie/credential নেই
+        });
 
 
 
@@ -44,8 +44,8 @@ async function bootstrap(): Promise<NestExpressApplication> {
 if (!process.env.VERCEL) {
     async function startLocalServer() {
         // Re-use the bootstrap logic for consistency, but start listening
-        const app = await bootstrap(); 
-        const port = process.env.PORT || 5000;
+        const app = await bootstrap();
+        const port = 5001;
         await app.listen(port);
         console.log(`🚀 Server is running on: http://localhost:${port}`);
     }

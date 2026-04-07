@@ -23,13 +23,14 @@ const product_entity_1 = require("../products/entities/product.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const payments_service_1 = require("../payments/payments.service");
 const common_2 = require("@nestjs/common");
+const voice_service_1 = require("../voice/voice.service");
 const notifications_service_1 = require("../notifications/notifications.service");
 const order_status_email_templates_1 = require("../common/templates/order-status-email.templates");
 const activity_log_service_1 = require("../systemuser/activity-log.service");
 const activity_log_entity_1 = require("../systemuser/entities/activity-log.entity");
 const systemuser_service_1 = require("../systemuser/systemuser.service");
 let OrderService = class OrderService {
-    constructor(orderRepo, statusHistoryRepo, productRepo, userRepo, dataSource, paymentsService, notificationsService, activityLogService, systemuserService, mailer) {
+    constructor(orderRepo, statusHistoryRepo, productRepo, userRepo, dataSource, paymentsService, notificationsService, activityLogService, systemuserService, mailer, voiceService) {
         this.orderRepo = orderRepo;
         this.statusHistoryRepo = statusHistoryRepo;
         this.productRepo = productRepo;
@@ -40,6 +41,7 @@ let OrderService = class OrderService {
         this.activityLogService = activityLogService;
         this.systemuserService = systemuserService;
         this.mailer = mailer;
+        this.voiceService = voiceService;
     }
     async addStatusHistory(orderId, previousStatus, newStatus, comment) {
         try {
@@ -221,6 +223,11 @@ let OrderService = class OrderService {
                 catch (e) {
                     console.error('Failed to log activity:', e);
                 }
+            }
+            const phoneToCall = fullOrder?.customerPhone || fullOrder?.customer?.phone;
+            if (phoneToCall && fullOrder) {
+                this.voiceService.makeOrderConfirmationCall(phoneToCall, fullOrder.id, companyId)
+                    .catch(e => console.error('Failed to trigger IVR confirmation call:', e));
             }
             return { order: fullOrder, payment };
         }
@@ -1088,6 +1095,7 @@ exports.OrderService = OrderService = __decorate([
     __param(2, (0, typeorm_1.InjectRepository)(product_entity_1.ProductEntity)),
     __param(3, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __param(9, (0, common_2.Inject)('MAILER_TRANSPORT')),
+    __param(10, (0, common_2.Inject)((0, common_2.forwardRef)(() => voice_service_1.VoiceService))),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
@@ -1096,6 +1104,6 @@ exports.OrderService = OrderService = __decorate([
         payments_service_1.PaymentsService,
         notifications_service_1.NotificationsService,
         activity_log_service_1.ActivityLogService,
-        systemuser_service_1.SystemuserService, Object])
+        systemuser_service_1.SystemuserService, Object, voice_service_1.VoiceService])
 ], OrderService);
 //# sourceMappingURL=orders.service.js.map

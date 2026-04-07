@@ -42,6 +42,7 @@ import { MediaModule } from './media/media.module';
 import { ResellerModule } from './reseller/reseller.module';
 import { CashModule } from './cash/cash.module';
 import { TopProductsModule } from './top-products/top-products.module';
+import { VoiceModule } from './voice/voice.module';
 
 @Global()
 @Module({
@@ -103,6 +104,7 @@ import { TopProductsModule } from './top-products/top-products.module';
     ResellerModule,
     TopProductsModule,
     CashModule,
+    VoiceModule,
   ],
 
   controllers: [AppController],

@@ -8,7 +8,8 @@ import { CreateOrderDto } from "./dto/create-order.dto";
 import { ProductEntity } from "../products/entities/product.entity";
 import { User } from "../users/entities/user.entity";
 import { PaymentsService } from "../payments/payments.service";
-import { Inject } from "@nestjs/common";
+import { Inject, forwardRef } from "@nestjs/common";
+import { VoiceService } from "../voice/voice.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import {
   generateOrderPlacedEmail,
@@ -36,6 +37,8 @@ export class OrderService {
     private readonly systemuserService: SystemuserService,
     @Inject('MAILER_TRANSPORT')
     private readonly mailer: { sendMail: (message: unknown) => Promise<{ id?: string }> },
+    @Inject(forwardRef(() => VoiceService))
+    private readonly voiceService: VoiceService,
   ) {}
 
   /** Save status change to history for tracking timeline */
@@ -272,6 +275,13 @@ export class OrderService {
         } catch (e) {
           console.error('Failed to log activity:', e);
         }
+      }
+
+      // Determine customer phone and trigger IVR call asynchronously
+      const phoneToCall = fullOrder?.customerPhone || fullOrder?.customer?.phone;
+      if (phoneToCall && fullOrder) {
+        this.voiceService.makeOrderConfirmationCall(phoneToCall, fullOrder.id, companyId)
+          .catch(e => console.error('Failed to trigger IVR confirmation call:', e));
       }
 
       return { order: fullOrder, payment };

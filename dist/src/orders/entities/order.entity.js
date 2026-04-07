@@ -80,7 +80,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Order.prototype, "isPaid", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.Column)({ default: '' }),
     __metadata("design:type", String)
 ], Order.prototype, "companyId", void 0);
 __decorate([

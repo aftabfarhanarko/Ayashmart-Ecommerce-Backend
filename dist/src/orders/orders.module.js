@@ -19,6 +19,8 @@ const product_entity_1 = require("../products/entities/product.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const notifications_module_1 = require("../notifications/notifications.module");
 const systemuser_module_1 = require("../systemuser/systemuser.module");
+const voice_module_1 = require("../voice/voice.module");
+const common_2 = require("@nestjs/common");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
@@ -28,6 +30,7 @@ exports.OrdersModule = OrdersModule = __decorate([
             payments_module_1.PaymentsModule,
             notifications_module_1.NotificationsModule,
             systemuser_module_1.SystemuserModule,
+            (0, common_2.forwardRef)(() => voice_module_1.VoiceModule),
             typeorm_1.TypeOrmModule.forFeature([
                 order_entity_1.Order,
                 order_status_history_entity_1.OrderStatusHistory,
