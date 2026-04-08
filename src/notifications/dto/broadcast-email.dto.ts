@@ -17,5 +17,10 @@ export class BroadcastEmailDto {
   @IsArray()
   @IsInt({ each: true })
   customerIds?: number[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  emails?: string[];
 }
 

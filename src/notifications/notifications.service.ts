@@ -27,25 +27,41 @@ export class NotificationsService {
 
     async sendEmailToCustomers(dto: BroadcastEmailDto) {
         const companyId = this.requestContextService.getCompanyId();
-        const recipients = (
-            await this.usersService.findCustomers(companyId, {
-                ids: dto.customerIds,
-            })
-        ).filter((user) => !!user.email);
+        
+        // 1. Get recipients from customer IDs
+        const customerRecipients = dto.customerIds?.length
+            ? (await this.usersService.findCustomers(companyId, { ids: dto.customerIds })).filter((u) => !!u.email)
+            : [];
 
-        if (!recipients.length) {
+        // 2. Build initial target list from customers
+        const targets: Array<{ email: string; name?: string; id?: number }> = customerRecipients.map((u) => ({
+            email: u.email!,
+            name: u.name,
+            id: u.id,
+        }));
+
+        // 3. Add direct email addresses if provided (and not already in list)
+        if (dto.emails?.length) {
+            dto.emails.forEach((email) => {
+                if (!targets.some((t) => t.email.toLowerCase() === email.toLowerCase())) {
+                    targets.push({ email });
+                }
+            });
+        }
+
+        if (!targets.length) {
             throw new NotFoundException('No customers with a valid email address were found');
         }
 
         const fromAddress = process.env.SMTP_FROM ?? process.env.SMTP_USER;
 
         const results = await Promise.allSettled(
-            recipients.map((user) => {
-                const personalizedBody = dto.body.replace(/{{\s*name\s*}}/gi, user.name ?? 'there');
+            targets.map((target) => {
+                const personalizedBody = dto.body.replace(/{{\s*name\s*}}/gi, target.name ?? 'there');
                 return this.mailer.sendMail({
                     companyId,
                     from: fromAddress,
-                    to: user.email,
+                    to: target.email,
                     subject: dto.subject,
                     text: personalizedBody,
                     html: dto.html,
@@ -53,7 +69,25 @@ export class NotificationsService {
             }),
         );
 
-        return this.buildSummary('email', recipients, results);
+        // Build summary manually since buildSummary expects User[]
+        const failed: Array<{ userId?: number; contact?: string; reason: string }> = [];
+        results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+                failed.push({
+                    userId: targets[index].id,
+                    contact: targets[index].email,
+                    reason: result.reason?.message ?? 'Unknown error',
+                });
+            }
+        });
+
+        return {
+            channel: 'email' as NotificationChannelType,
+            totalRecipients: targets.length,
+            delivered: targets.length - failed.length,
+            failed: failed.length,
+            failedRecipients: failed,
+        };
     }
 
     async sendSmsToCustomers(dto: BroadcastSmsDto) {
