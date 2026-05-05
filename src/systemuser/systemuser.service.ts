@@ -54,6 +54,22 @@ export class SystemuserService {
     return crypto.createHmac('sha256', salt).update(password).digest('hex');
   }
 
+  private isMissingPaidColumnsError(error: unknown): boolean {
+    const err = error as { code?: string; message?: string };
+    if (err?.code !== '42703') return false;
+    const msg = (err?.message || '').toLowerCase();
+    return msg.includes('paidtotalsoldqty') || msg.includes('paidtotalearning');
+  }
+
+  private async ensurePaidColumnsExist(): Promise<void> {
+    await this.systemUserRepo.query(
+      `ALTER TABLE "system_users" ADD COLUMN IF NOT EXISTS "paidTotalSoldQty" integer NOT NULL DEFAULT 0`,
+    );
+    await this.systemUserRepo.query(
+      `ALTER TABLE "system_users" ADD COLUMN IF NOT EXISTS "paidTotalEarning" numeric(12,2) NOT NULL DEFAULT 0`,
+    );
+  }
+
   private async sendUpdateEmail(user: any, newPassword?: string) {
     try {
       const html = EmailTemplates.getUserUpdateTemplate(user, newPassword);
@@ -539,11 +555,24 @@ export class SystemuserService {
 
   async findAll(companyId?: string) {
     const whereCondition = companyId ? { companyId } : {};
-    const list = await this.systemUserRepo.find({ 
-      where: whereCondition,
-      order: { id: 'DESC' },
-      relations: ['package', 'theme', 'invoices'],
-    });
+    let list: SystemUser[];
+    try {
+      list = await this.systemUserRepo.find({
+        where: whereCondition,
+        order: { id: 'DESC' },
+        relations: ['package', 'theme', 'invoices'],
+      });
+    } catch (error) {
+      if (!this.isMissingPaidColumnsError(error)) {
+        throw error;
+      }
+      await this.ensurePaidColumnsExist();
+      list = await this.systemUserRepo.find({
+        where: whereCondition,
+        order: { id: 'DESC' },
+        relations: ['package', 'theme', 'invoices'],
+      });
+    }
     return list.map(({ passwordHash, passwordSalt, ...safe }) => safe);
   }
 
