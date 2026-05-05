@@ -1202,8 +1202,8 @@ export class OrderService {
         case "processing": {
           subject = `Order #${order.id} is now being processed`;
 
-          // Build public tracking URL for customer email (frontend URL comes from env)
-          const frontendBase = 'https://www.fiberace.shop';
+          // Build public tracking URL for customer email
+          const frontendBase = 'https://cart.nexoviasoft.com';
           const trackingId = order.shippingTrackingId ?? undefined;
           const trackingUrl =
             frontendBase && trackingId
@@ -1223,12 +1223,21 @@ export class OrderService {
         }
         case "shipped":
           subject = `Order #${order.id} has been shipped`;
+          const frontendBase = 'https://cart.nexoviasoft.com';
+          const trackingId = order.shippingTrackingId ?? undefined;
+          const trackingUrl =
+            frontendBase && trackingId
+              ? `${frontendBase.replace(/\/+$/, "")}/order-tracking?trackingId=${encodeURIComponent(
+                  trackingId,
+                )}`
+              : undefined;
           html = generateOrderShippedEmail(
             customerName,
             order.id,
-            order.shippingTrackingId ?? undefined,
+            trackingId,
             order.shippingProvider ?? undefined,
             storeName,
+            trackingUrl,
           );
           break;
         case "delivered":

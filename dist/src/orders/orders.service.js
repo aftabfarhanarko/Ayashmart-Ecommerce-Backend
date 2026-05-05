@@ -993,7 +993,7 @@ let OrderService = class OrderService {
                     break;
                 case "processing": {
                     subject = `Order #${order.id} is now being processed`;
-                    const frontendBase = 'https://www.fiberace.shop';
+                    const frontendBase = 'https://cart.nexoviasoft.com';
                     const trackingId = order.shippingTrackingId ?? undefined;
                     const trackingUrl = frontendBase && trackingId
                         ? `${frontendBase.replace(/\/+$/, "")}/order-tracking?trackingId=${encodeURIComponent(trackingId)}`
@@ -1003,7 +1003,12 @@ let OrderService = class OrderService {
                 }
                 case "shipped":
                     subject = `Order #${order.id} has been shipped`;
-                    html = (0, order_status_email_templates_1.generateOrderShippedEmail)(customerName, order.id, order.shippingTrackingId ?? undefined, order.shippingProvider ?? undefined, storeName);
+                    const frontendBase = 'https://cart.nexoviasoft.com';
+                    const trackingId = order.shippingTrackingId ?? undefined;
+                    const trackingUrl = frontendBase && trackingId
+                        ? `${frontendBase.replace(/\/+$/, "")}/order-tracking?trackingId=${encodeURIComponent(trackingId)}`
+                        : undefined;
+                    html = (0, order_status_email_templates_1.generateOrderShippedEmail)(customerName, order.id, trackingId, order.shippingProvider ?? undefined, storeName, trackingUrl);
                     break;
                 case "delivered":
                     subject = `Order #${order.id} has been delivered`;

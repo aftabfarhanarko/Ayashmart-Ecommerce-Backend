@@ -140,9 +140,20 @@ function generateOrderProcessingEmail(customerName, orderId, storeName, tracking
 </body>
 </html>`;
 }
-function generateOrderShippedEmail(customerName, orderId, trackingId, provider, storeName) {
+function generateOrderShippedEmail(customerName, orderId, trackingId, provider, storeName, trackingUrl) {
     const trackingInfo = trackingId
         ? `<p style="margin: 10px 0 0; font-size: 13px; color: #e5e7eb;">Tracking ID: <strong>${trackingId}</strong>${provider ? ` (${provider})` : ''}</p>`
+        : '';
+    const trackingCta = trackingUrl
+        ? `<table cellpadding="0" cellspacing="0" style="margin-top: 14px;">
+        <tr>
+          <td>
+            <a href="${trackingUrl}" style="display: inline-block; padding: 10px 18px; border-radius: 999px; background: linear-gradient(to right, #ffffff, #111111); color: #000000; font-size: 13px; font-weight: 600; text-decoration: none;">
+              Track your order${trackingId ? ` (#${trackingId})` : ""}
+            </a>
+          </td>
+        </tr>
+      </table>`
         : '';
     return `
 <!DOCTYPE html>
@@ -174,6 +185,7 @@ function generateOrderShippedEmail(customerName, orderId, trackingId, provider, 
                 Estimated delivery time may vary based on the courier. You can use the tracking details below to follow your package.
               </p>
               ${trackingInfo}
+              ${trackingCta}
             </div>
 
             <p style="margin: 18px 0 0; font-size: 12px; color: #999999;">
