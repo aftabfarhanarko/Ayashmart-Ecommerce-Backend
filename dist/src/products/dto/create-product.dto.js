@@ -123,6 +123,11 @@ __decorate([
 ], CreateProductDto.prototype, "variants", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    __metadata("design:type", Array)
+], CreateProductDto.prototype, "types", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "weight", void 0);

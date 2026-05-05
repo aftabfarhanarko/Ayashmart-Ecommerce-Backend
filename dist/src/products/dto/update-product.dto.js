@@ -135,6 +135,11 @@ __decorate([
 ], UpdateProductDto.prototype, "variants", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    __metadata("design:type", Array)
+], UpdateProductDto.prototype, "types", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], UpdateProductDto.prototype, "weight", void 0);

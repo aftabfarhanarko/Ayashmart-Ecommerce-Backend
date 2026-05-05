@@ -73,43 +73,47 @@ export class MediaService {
       rawName.replace(/[^a-zA-Z0-9-_]/g, '_') || `image_${Date.now()}`;
     const size = this.formatFileSize(file.size);
 
-    const cdnUploadUrl =
-      process.env.CDN_UPLOAD_URL ||
-      'https://e-cdn.vercel.app/upload/image';
+    const imgbbApiKey =
+      process.env.IMGBB_API_KEY || '9a222d83ac769876ed9961fa873ebb51';
+    const imgbbUploadUrl = `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`;
 
     let cdnUrl: string | undefined;
     try {
       const formData = new FormData();
-      formData.append('file', file.buffer, {
+      formData.append('image', file.buffer, {
         filename: file.originalname || 'image.jpg',
         contentType: file.mimetype,
       });
 
-      const response = await axios.post(cdnUploadUrl, formData, {
+      const response = await axios.post(imgbbUploadUrl, formData, {
         headers: formData.getHeaders(),
       });
 
       const data = response?.data as
         | {
             success?: boolean;
-            message?: string;
-            url?: string;
-            secure_url?: string;
-            path?: string;
+            data?: {
+              url?: string;
+              display_url?: string;
+            };
+            error?: {
+              message?: string;
+            };
           }
         | null;
 
-      if (!data?.success || !data.url) {
+      const uploadedUrl = data?.data?.display_url || data?.data?.url;
+      if (!data?.success || !uploadedUrl) {
         throw new BadRequestException(
-          data?.message || 'CDN upload response invalid',
+          data?.error?.message || 'ImgBB upload response invalid',
         );
       }
 
-      cdnUrl = data.url || data.secure_url || data.path;
+      cdnUrl = uploadedUrl;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('[MediaService] CDN upload failed', error);
-      throw new BadRequestException('Failed to upload image to CDN');
+      console.error('[MediaService] ImgBB upload failed', error);
+      throw new BadRequestException('Failed to upload image to ImgBB');
     }
 
     if (!cdnUrl) {

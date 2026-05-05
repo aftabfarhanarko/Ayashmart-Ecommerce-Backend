@@ -25,6 +25,7 @@ export declare class UpdateProductDto {
     variants?: {
         name: string;
     }[];
+    types?: string[];
     weight?: number;
     length?: number;
     breadth?: number;

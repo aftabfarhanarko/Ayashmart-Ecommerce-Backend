@@ -88,6 +88,7 @@ let ProductService = class ProductService {
                 isLowStock: createDto.isLowStock ?? false,
                 sizes: createDto.sizes,
                 variants: createDto.variants,
+                types: createDto.types,
                 weight: createDto.weight,
                 length: createDto.length,
                 breadth: createDto.breadth,
@@ -489,6 +490,8 @@ let ProductService = class ProductService {
             product.sizes = updateDto.sizes;
         if (updateDto.variants !== undefined)
             product.variants = updateDto.variants;
+        if (updateDto.types !== undefined)
+            product.types = updateDto.types;
         if (updateDto.weight !== undefined)
             product.weight = updateDto.weight;
         if (updateDto.length !== undefined)

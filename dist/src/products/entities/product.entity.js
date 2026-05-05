@@ -100,6 +100,10 @@ __decorate([
     __metadata("design:type", Array)
 ], ProductEntity.prototype, "variants", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'simple-json', nullable: true }),
+    __metadata("design:type", Array)
+], ProductEntity.prototype, "types", void 0);
+__decorate([
     (0, typeorm_1.Column)("decimal", { precision: 10, scale: 2, nullable: true }),
     __metadata("design:type", Number)
 ], ProductEntity.prototype, "weight", void 0);

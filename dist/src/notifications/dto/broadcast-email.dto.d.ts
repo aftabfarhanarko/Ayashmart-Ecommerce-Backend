@@ -3,4 +3,5 @@ export declare class BroadcastEmailDto {
     body: string;
     html?: string;
     customerIds?: number[];
+    emails?: string[];
 }

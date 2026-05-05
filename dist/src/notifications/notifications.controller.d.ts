@@ -51,7 +51,7 @@ export declare class NotificationsController {
             delivered: number;
             failed: number;
             failedRecipients: {
-                userId: number;
+                userId?: number;
                 contact?: string;
                 reason: string;
             }[];

@@ -31,25 +31,53 @@ let NotificationsService = class NotificationsService {
     }
     async sendEmailToCustomers(dto) {
         const companyId = this.requestContextService.getCompanyId();
-        const recipients = (await this.usersService.findCustomers(companyId, {
-            ids: dto.customerIds,
-        })).filter((user) => !!user.email);
-        if (!recipients.length) {
+        const customerRecipients = dto.customerIds?.length
+            ? (await this.usersService.findCustomers(companyId, { ids: dto.customerIds })).filter((u) => !!u.email)
+            : [];
+        const targets = customerRecipients.map((u) => ({
+            email: u.email,
+            name: u.name,
+            id: u.id,
+        }));
+        if (dto.emails?.length) {
+            dto.emails.forEach((email) => {
+                if (!targets.some((t) => t.email.toLowerCase() === email.toLowerCase())) {
+                    targets.push({ email });
+                }
+            });
+        }
+        if (!targets.length) {
             throw new common_1.NotFoundException('No customers with a valid email address were found');
         }
         const fromAddress = process.env.SMTP_FROM ?? process.env.SMTP_USER;
-        const results = await Promise.allSettled(recipients.map((user) => {
-            const personalizedBody = dto.body.replace(/{{\s*name\s*}}/gi, user.name ?? 'there');
+        const results = await Promise.allSettled(targets.map((target) => {
+            const personalizedBody = dto.body.replace(/{{\s*name\s*}}/gi, target.name ?? 'there');
             return this.mailer.sendMail({
                 companyId,
                 from: fromAddress,
-                to: user.email,
+                to: target.email,
                 subject: dto.subject,
                 text: personalizedBody,
                 html: dto.html,
             });
         }));
-        return this.buildSummary('email', recipients, results);
+        const failed = [];
+        results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+                failed.push({
+                    userId: targets[index].id,
+                    contact: targets[index].email,
+                    reason: result.reason?.message ?? 'Unknown error',
+                });
+            }
+        });
+        return {
+            channel: 'email',
+            totalRecipients: targets.length,
+            delivered: targets.length - failed.length,
+            failed: failed.length,
+            failedRecipients: failed,
+        };
     }
     async sendSmsToCustomers(dto) {
         const companyId = this.requestContextService.getCompanyId();

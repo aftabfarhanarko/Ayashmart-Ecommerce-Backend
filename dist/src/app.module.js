@@ -50,6 +50,8 @@ const reseller_module_1 = require("./reseller/reseller.module");
 const cash_module_1 = require("./cash/cash.module");
 const top_products_module_1 = require("./top-products/top-products.module");
 const voice_module_1 = require("./voice/voice.module");
+const databaseUrl = process.env.DATABASE_URL || '';
+const useStrictSsl = /sslmode=(require|verify-ca|verify-full)/i.test(databaseUrl);
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -66,13 +68,13 @@ exports.AppModule = AppModule = __decorate([
             }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
-                url: process.env.DATABASE_URL,
-                synchronize: true,
-                logging: true,
-                ssl: {
-                    rejectUnauthorized: false,
-                },
+                url: databaseUrl,
+                synchronize: false,
+                logging: false,
+                ssl: useStrictSsl ? { rejectUnauthorized: true } : false,
                 autoLoadEntities: true,
+                migrations: [__dirname + '/migrations/*.{ts,js}'],
+                migrationsRun: true,
             }),
             typeorm_1.TypeOrmModule.forFeature([systemuser_entity_1.SystemUser]),
             schedule_1.ScheduleModule.forRoot(),

@@ -66,27 +66,28 @@ let MediaService = class MediaService {
         const rawName = path.basename(file.originalname, ext);
         const title = rawName.replace(/[^a-zA-Z0-9-_]/g, '_') || `image_${Date.now()}`;
         const size = this.formatFileSize(file.size);
-        const cdnUploadUrl = process.env.CDN_UPLOAD_URL ||
-            'https://e-cdn.vercel.app/upload/image';
+        const imgbbApiKey = process.env.IMGBB_API_KEY || '9a222d83ac769876ed9961fa873ebb51';
+        const imgbbUploadUrl = `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`;
         let cdnUrl;
         try {
             const formData = new form_data_1.default();
-            formData.append('file', file.buffer, {
+            formData.append('image', file.buffer, {
                 filename: file.originalname || 'image.jpg',
                 contentType: file.mimetype,
             });
-            const response = await axios_1.default.post(cdnUploadUrl, formData, {
+            const response = await axios_1.default.post(imgbbUploadUrl, formData, {
                 headers: formData.getHeaders(),
             });
             const data = response?.data;
-            if (!data?.success || !data.url) {
-                throw new common_1.BadRequestException(data?.message || 'CDN upload response invalid');
+            const uploadedUrl = data?.data?.display_url || data?.data?.url;
+            if (!data?.success || !uploadedUrl) {
+                throw new common_1.BadRequestException(data?.error?.message || 'ImgBB upload response invalid');
             }
-            cdnUrl = data.url || data.secure_url || data.path;
+            cdnUrl = uploadedUrl;
         }
         catch (error) {
-            console.error('[MediaService] CDN upload failed', error);
-            throw new common_1.BadRequestException('Failed to upload image to CDN');
+            console.error('[MediaService] ImgBB upload failed', error);
+            throw new common_1.BadRequestException('Failed to upload image to ImgBB');
         }
         if (!cdnUrl) {
             throw new common_1.BadRequestException('CDN did not return a URL');
