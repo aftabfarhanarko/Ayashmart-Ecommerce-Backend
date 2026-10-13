@@ -52,8 +52,8 @@
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/aftabfarhanarko/-AI-Powered-Admin-API.git
-cd -AI-Powered-Admin-API
+git clone https://github.com/aftabfarhanarko/Ayashmart-Ecommerce-Backend.git
+cd Ayashmart-Ecommerce-Backend
 ```
 
 ### 2. Install dependencies
