@@ -1,8 +1,8 @@
 {
-  "name": "e-backend",
-  "version": "0.0.1",
-  "description": "NestJS backend for Vercel deployment",
-  "author": "",
+  "name": "ayashmart-ecommerce-backend",
+  "version": "1.0.0",
+  "description": "AyashMart E-Commerce Backend API",
+  "author": "Aftab Farhan Arko",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
